@@ -1,6 +1,6 @@
 export type Brand = "Duomo" | "Grido" | "Cremolatti" | "Todas";
 export type SentimentLabel = "positive" | "neutral" | "negative";
-export type DataType = "real" | "prototype";
+export type DataType = "real" | "prototype" | "real-pilot" | "unverified-seed";
 export type Source = "Google" | "Instagram" | "Facebook" | "TikTok" | "YouTube" | "Tripadvisor" | "Todas";
 export type Province = "Misiones" | "Corrientes" | "Chaco" | "Formosa" | "Todas";
 
@@ -29,12 +29,33 @@ export interface Review {
   dataType: DataType;
   sourceUrl?: string;
   url?: string;
+  collectedAt?: string;
   sentiment: {
     label: SentimentLabel;
     score: number; // -1 to 1
   };
   aspects: AspectSentiment[];
   topics: string[];
+}
+
+export interface RealPilotReview {
+  id: string;
+  brand: "Duomo";
+  branchId: string;
+  branchName: string;
+  city: string;
+  province: string;
+  source: string;
+  rating?: number;
+  reviewDate?: string;
+  text: string;
+  sourceUrl: string;
+  collectedAt: string;
+  dataType: "real-pilot";
+  sentimentLabel?: SentimentLabel;
+  sentimentScore?: number;
+  topics?: string[];
+  flavorMentioned?: string;
 }
 
 export interface GlobalFilters {
@@ -48,6 +69,8 @@ export interface GlobalFilters {
   source: string | null;     // "Google" | "Instagram" | "Facebook" | "TikTok" | null
   period: string | null;     // "Últimos 90 días" | "Últimos 30 días" | "Año Móvil" | null
   searchQuery: string;
+  dataMode?: "all" | "prototype" | "real-pilot" | "unverified-seed" | null;
+  dataTypeFilter?: "Todas" | "real-pilot" | "prototype" | "unverified-seed" | null;
 }
 
 export type FilterState = GlobalFilters;

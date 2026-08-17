@@ -31,15 +31,29 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectPage }) => {
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-amber-50/50 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-xs font-bold tracking-wide">
-            <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
-            <span>AI CONSUMER INTELLIGENCE · HELADOS DUOMO</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-xs font-bold tracking-wide">
+              <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
+              <span>AI CONSUMER INTELLIGENCE · HELADOS DUOMO</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-bold tracking-wide">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+              <span>PILOTO REAL: 15 SUCURSALES / 104 REVIEWS</span>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#112A23] font-['Outfit'] tracking-tight leading-[1.15]">
-            El Sabor de la IA <br className="hidden sm:inline" />
-            <span className="text-[#1B4D3E]">by Duomo Helados</span>
-          </h1>
+          <div className="flex items-center gap-4 pt-1">
+            <img
+              src="/brand/duomo-logo.svg"
+              alt="Duomo Helados"
+              className="h-12 sm:h-14 w-auto object-contain shrink-0"
+            />
+            <div className="h-10 w-px bg-stone-200 hidden sm:block" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#112A23] font-['Outfit'] tracking-tight leading-[1.15]">
+              El Sabor de la IA <br className="hidden sm:inline" />
+              <span className="text-[#1B4D3E] text-xl sm:text-2xl font-bold">by Duomo Helados</span>
+            </h1>
+          </div>
 
           <p className="text-lg sm:text-xl font-semibold text-stone-800 leading-snug">
             Transformamos la voz digital del consumidor en señales de negocio para producto, marketing y operaciones.

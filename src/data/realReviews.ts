@@ -1,9 +1,8 @@
 import { Review } from "../types";
 
 /**
- * REPOSITORIO DE REVIEWS REALES Y VERIFICABLES
- * Obtenidas de fuentes públicas (Google Business Profiles, Facebook, Instagram de Helados Duomo y competencia).
- * Identificadas estrictamente con badge `dataType: "real"`.
+ * REPOSITORIO DE REVIEWS INICIALES / UNVERIFIED SEED
+ * Reclasificadas preventivamente como `unverified-seed` para auditoría metodológica.
  */
 export const REAL_REVIEWS: Review[] = [
   {
@@ -17,7 +16,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-03-12",
     rating: 5,
     text: "Excelente atención, el lugar es bastante lindo ahora que lo remodelaron, acceso para silla de ruedas. Entregan los productos en buen tiempo y el sabor Sambayón con cerezas sigue siendo inigualable.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Duomo+Helados+Bolivar+Posadas",
     sentiment: {
       label: "positive",
@@ -43,7 +42,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-02-18",
     rating: 3,
     text: "Muy buena atención del turno de la noche, siempre amables con los chicos. El turno de día deja mucho que desear, tardaron 20 minutos para un cucurucho y no tenían cambio.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Duomo+Helados+Uruguay+Posadas",
     sentiment: {
       label: "neutral",
@@ -67,7 +66,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-04-05",
     rating: 4,
     text: "Los mejores helados del litoral sin dudas, cremosos y buen precio respecto a la calidad. Fuimos a probar el Pistacho pero ya no quedaba stock a las 21hs. Tuvimos que pedir Tramontana.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Duomo+Helados+Corrientes+Junin",
     sentiment: {
       label: "positive",
@@ -92,7 +91,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-01-29",
     rating: 4,
     text: "El helado 10 puntos como siempre en Duomo. Muchísima gente el domingo, deberían habilitar dos cajas porque la fila salía a la vereda. El pago con QR de Mercado Pago anduvo rápido.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Duomo+Helados+Resistencia+Sarmiento",
     sentiment: {
       label: "positive",
@@ -116,7 +115,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-03-22",
     rating: 5,
     text: "El Dulce de Leche Duomo con nueces es insuperable. El local está impecable, el aire acondicionado bien frío fundamental con el calor de Formosa y las chicas muy amables.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Duomo+Helados+Formosa+Centro",
     sentiment: {
       label: "positive",
@@ -141,7 +140,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-04-14",
     rating: 5,
     text: "Tremendo el nuevo lanzamiento de Chocolate Dubai con kataifi crocante! Ojalá lo dejen fijo en la carta y no sea solo por tiempo limitado por favor 🙏🍨",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.instagram.com/p/heladosduomo_post",
     sentiment: {
       label: "positive",
@@ -165,7 +164,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-02-10",
     rating: 2,
     text: "El helado riquísimo como siempre, pero el delivery por PedidosYa tardó 1 hora y 15 minutos. Llegó medio derretido en las puntas el pote de kilo. Una lástima.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.facebook.com/heladosduomo/reviews",
     sentiment: {
       label: "negative",
@@ -191,7 +190,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-03-01",
     rating: 4,
     text: "Súper económico para venir con toda la familia o el cumpleaños de los chicos. Las promociones con Club Grido convienen mucho. No le pidas helado artesanal de alta gama, pero zafa re bien.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Grido+Helado+Posadas",
     sentiment: {
       label: "positive",
@@ -215,7 +214,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-01-15",
     rating: 2,
     text: "Precios bajos, pero los gustos son muy artificiales y los chocolates tienen gusto a grasa hidrogenada. La atención de la chica fue fría.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Grido+Helado+Corrientes",
     sentiment: {
       label: "negative",
@@ -242,7 +241,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-03-19",
     rating: 4,
     text: "Helado bien cremoso, estilo italiano tradicional. El sabor Pistacchio di Bronte y el Mascarpone con frutos del bosque son exquisitos. Eso sí, el kilo está bastante más caro que Duomo y Grido.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.google.com/maps/place/Cremolatti+Posadas+Costanera",
     sentiment: {
       label: "positive",
@@ -266,7 +265,7 @@ export const REAL_REVIEWS: Review[] = [
     date: "2024-02-25",
     rating: 4,
     text: "Hermosa ambientación del local, da gusto sentarse a tomar un café con helado. Tienen opciones veganas y sin tacc muy bien cuidadas.",
-    dataType: "real",
+    dataType: "unverified-seed",
     sourceUrl: "https://www.instagram.com/cremolattihelados",
     sentiment: {
       label: "positive",
@@ -280,3 +279,4 @@ export const REAL_REVIEWS: Review[] = [
     topics: ["Experiencia en tienda", "Dietas especiales (Sin TACC / Vegano)", "Cafetería y salón"],
   },
 ];
+

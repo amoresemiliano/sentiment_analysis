@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="duomoConeEmblem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6B86C"/>
+      <stop offset="100%" stop-color="#D97724"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#143D32"/>
+  <!-- Cone -->
+  <path d="M50 48 L68 84 L32 84 Z" fill="url(#duomoConeEmblem)" stroke="#B85D1B" stroke-width="1.5" stroke-linejoin="round" transform="rotate(180 50 66)"/>
+  <!-- Scoops -->
+  <circle cx="50" cy="42" r="18" fill="#E6A15C"/>
+  <circle cx="40" cy="46" r="14" fill="#1B4D3E"/>
+  <circle cx="60" cy="46" r="14" fill="#C2410C"/>
+  <circle cx="50" cy="34" r="15" fill="#FAF5EE" stroke="#1B4D3E" stroke-width="2"/>
+  <!-- Cherry/Crown -->
+  <circle cx="50" cy="18" r="6" fill="#E11D48"/>
+  <path d="M51 13 Q57 8 62 10" stroke="#15803D" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

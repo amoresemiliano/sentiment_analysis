@@ -79,12 +79,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}
     >
       {/* Brand Header */}
-      <div className="h-16 px-4 flex items-center justify-between border-b border-emerald-900/50 bg-[#0E3027]">
+      <div className="h-16 px-3.5 flex items-center justify-between border-b border-emerald-900/50 bg-[#0E3027]">
         {!isCollapsed ? (
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-[#E6A15C] text-[#2C1810] flex items-center justify-center font-black font-['Outfit'] shadow-xs shrink-0">
-              D
-            </div>
+            <img
+              src="/brand/duomo-emblem.svg"
+              alt="Duomo Helados"
+              className="w-8 h-8 rounded-lg shadow-sm shrink-0 object-contain"
+            />
             <div className="leading-tight truncate">
               <span className="font-bold text-sm text-white font-['Outfit'] tracking-wide block">
                 El Sabor de la IA
@@ -95,9 +97,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
         ) : (
-          <div className="w-8 h-8 mx-auto rounded-lg bg-[#E6A15C] text-[#2C1810] flex items-center justify-center font-black font-['Outfit'] shadow-xs">
-            D
-          </div>
+          <img
+            src="/brand/duomo-emblem.svg"
+            alt="Duomo Helados"
+            className="w-8 h-8 mx-auto rounded-lg shadow-sm object-contain"
+          />
         )}
 
         <button

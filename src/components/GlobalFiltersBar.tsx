@@ -188,6 +188,20 @@ export const GlobalFiltersBar: React.FC<GlobalFiltersBarProps> = ({
               <option value="Año Móvil">Año Móvil (12 meses)</option>
             </select>
           </div>
+
+          {/* 8. Data Mode / Provenance */}
+          <div className="flex items-center gap-1 bg-emerald-50/70 border border-emerald-300/80 rounded-lg px-2 py-1 shadow-2xs hover:border-emerald-400 transition-colors">
+            <Layers className="w-3 h-3 text-emerald-700 shrink-0" />
+            <select
+              value={filters.dataMode || "all"}
+              onChange={(e) => onFilterChange({ ...filters, dataMode: e.target.value as any })}
+              className="bg-transparent text-emerald-950 font-semibold focus:outline-none cursor-pointer text-xs"
+            >
+              <option value="all">Modo: Todos los datos (Piloto + Prototipo)</option>
+              <option value="real-pilot">🟢 Solo Piloto Real Verificado (104 reseñas / 15 sucursales)</option>
+              <option value="prototype">🟡 Solo Corpus Prototipo (Simulado)</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

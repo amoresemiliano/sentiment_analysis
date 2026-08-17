@@ -1,10 +1,12 @@
 import { GlobalFilters, Review, Branch, EvidenceContextData, DynamicOverviewMetrics, SentimentTopicMatrixRow, TopicMetric, ProductInsight } from "../types";
 import { REAL_REVIEWS } from "./realReviews";
+import { REAL_PILOT_REVIEWS } from "./realPilotReviews";
 import { CANONICAL_BRANCHES } from "./canonicalBranches";
 import { PROTOTYPE_REVIEWS } from "./prototypeMetrics";
 
-// Complete pool of all reviews
+// Complete pool of all reviews including the verified Real Pilot Dataset
 export const ALL_REVIEWS_POOL: Review[] = [
+  ...REAL_PILOT_REVIEWS,
   ...REAL_REVIEWS,
   ...PROTOTYPE_REVIEWS,
 ];
@@ -12,6 +14,12 @@ export const ALL_REVIEWS_POOL: Review[] = [
 // Helper to filter reviews based on GlobalFilters
 export function getFilteredReviews(filters: GlobalFilters): Review[] {
   return ALL_REVIEWS_POOL.filter((r) => {
+    // Data Mode filter
+    if (filters.dataMode && filters.dataMode !== "all") {
+      if (filters.dataMode === "real-pilot" && r.dataType !== "real-pilot") return false;
+      if (filters.dataMode === "prototype" && r.dataType !== "prototype") return false;
+      if (filters.dataMode === "unverified-seed" && r.dataType !== "unverified-seed") return false;
+    }
     // Brand
     if (filters.brand && filters.brand !== "Todas" && r.brand !== filters.brand) {
       return false;

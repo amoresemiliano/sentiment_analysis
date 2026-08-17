@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 90" fill="none">
+  <!-- Duomo Helados Official Brand Logo Representation -->
+  <defs>
+    <linearGradient id="duomoCone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6B86C"/>
+      <stop offset="100%" stop-color="#D97724"/>
+    </linearGradient>
+    <linearGradient id="duomoScoop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FAF5EE"/>
+      <stop offset="100%" stop-color="#EAD6BF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ice cream emblem -->
+  <g transform="translate(10, 8)">
+    <!-- Waffle Cone -->
+    <path d="M28 42 L42 76 L14 76 Z" fill="url(#duomoCone)" stroke="#B85D1B" stroke-width="1.5" stroke-linejoin="round" transform="rotate(180 28 59)"/>
+    <!-- Waffle pattern lines -->
+    <path d="M20 50 L36 66 M36 50 L20 66 M24 44 L32 52 M32 44 L24 52" stroke="#9A4811" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+    <!-- Scoops -->
+    <circle cx="28" cy="34" r="16" fill="#1B4D3E"/>
+    <circle cx="20" cy="36" r="12" fill="#E6A15C"/>
+    <circle cx="36" cy="36" r="12" fill="#C2410C"/>
+    <circle cx="28" cy="26" r="14" fill="#FAF5EE" stroke="#1B4D3E" stroke-width="1.5"/>
+    <!-- Cherry/Crown accent -->
+    <circle cx="28" cy="11" r="5" fill="#E11D48"/>
+    <path d="M29 7 Q34 2 38 4" stroke="#15803D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Logotype Typography: DUOMO -->
+  <text x="75" y="48" font-family="'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="38" fill="#1B4D3E" letter-spacing="-0.5">
+    duomo
+  </text>
+
+  <!-- Subtitle: HELADOS -->
+  <text x="77" y="66" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="800" font-size="13" fill="#D97724" letter-spacing="3.5">
+    HELADOS
+  </text>
+  
+  <!-- Est. NEA Accent -->
+  <text x="210" y="47" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="700" font-size="9" fill="#8C7A6B" letter-spacing="0.5">
+    NEA · 90 SUCURSALES
+  </text>
+</svg>
