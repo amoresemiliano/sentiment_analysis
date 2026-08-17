@@ -4,257 +4,220 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
+  Store,
   MessageSquare,
-  Swords,
+  ShieldCheck,
+  Zap,
+  Target,
+  BarChart3,
   Layers,
   GraduationCap,
-  ShieldCheck,
-  CheckCircle,
-  BarChart3,
-  Cpu,
+  ChevronRight,
+  Award,
+  CheckCircle2,
 } from "lucide-react";
 
 interface HomePageProps {
   onSelectPage: (page: NavPage) => void;
-  onOpenAboutModal: () => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onSelectPage, onOpenAboutModal }) => {
+export const HomePage: React.FC<HomePageProps> = ({ onSelectPage }) => {
   return (
-    <div className="space-y-12 max-w-6xl mx-auto pb-16 font-['Plus_Jakarta_Sans']">
+    <div className="space-y-8 max-w-6xl mx-auto pb-12 font-['Plus_Jakarta_Sans']">
       {/* Hero Section */}
-      <section className="pt-8 sm:pt-12 text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1B4D3E]/10 border border-[#1B4D3E]/20 text-[#1B4D3E] text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
-          <span>Inteligencia Artificial para Estrategia Gastronómica</span>
-        </div>
+      <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs relative overflow-hidden">
+        {/* Subtle decorative background glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-50/60 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-amber-50/50 rounded-full blur-3xl pointer-events-none" />
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#112A23] font-['Outfit'] tracking-tight leading-[1.15] max-w-4xl mx-auto">
-          De opiniones a <span className="text-[#1B4D3E] underline decoration-[#E6A15C]/60 decoration-4">decisiones</span>.
-        </h1>
+        <div className="relative z-10 max-w-3xl space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-xs font-bold tracking-wide">
+            <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
+            <span>AI CONSUMER INTELLIGENCE · HELADOS DUOMO</span>
+          </div>
 
-        <p className="text-lg sm:text-xl text-stone-600 font-medium max-w-2xl mx-auto leading-relaxed">
-          Transformamos la voz digital del consumidor en señales de negocio para producto, marketing y operaciones.
-        </p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#112A23] font-['Outfit'] tracking-tight leading-[1.15]">
+            El Sabor de la IA <br className="hidden sm:inline" />
+            <span className="text-[#1B4D3E]">by Duomo Helados</span>
+          </h1>
 
-        <p className="text-sm text-stone-500 max-w-xl mx-auto italic font-['Newsreader']">
-          “Duomo sabe con precisión cuánto vende y produce. Ahora también puede entender, a escala continua, qué piensan sus clientes y por qué.”
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button
-            onClick={() => onSelectPage("overview")}
-            className="px-6 py-3.5 rounded-xl bg-[#1B4D3E] hover:bg-[#143D32] text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2 group cursor-pointer"
-          >
-            <span>Explorar Consumer Intelligence</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </button>
-
-          <button
-            onClick={() => onSelectPage("ai-methodology")}
-            className="px-6 py-3.5 rounded-xl bg-white hover:bg-stone-100/80 text-stone-700 font-semibold text-sm border border-stone-300 transition-all shadow-xs flex items-center gap-2 cursor-pointer"
-          >
-            <Cpu className="w-4 h-4 text-stone-500" />
-            <span>Ver Metodología AI</span>
-          </button>
-        </div>
-      </section>
-
-      {/* Brand Positioning Spectrum */}
-      <section className="bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
-        <div className="text-center space-y-1">
-          <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">
-            Hipótesis de Mercado & Percepción Digital
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 font-['Outfit']">
-            El Triángulo Competitivo en el Litoral (NEA)
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 max-w-2xl mx-auto">
-            ¿Cómo se ubica Helados Duomo frente a Grido y Cremolatti en las conversaciones de los clientes?
+          <p className="text-lg sm:text-xl font-semibold text-stone-800 leading-snug">
+            Transformamos la voz digital del consumidor en señales de negocio para producto, marketing y operaciones.
           </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Duomo */}
-          <div className="bg-[#FAF9F5] border-2 border-[#1B4D3E] rounded-xl p-5 relative flex flex-col justify-between shadow-xs">
-            <div className="absolute -top-3 left-4 bg-[#1B4D3E] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              Nuestra Marca
+          <blockquote className="border-l-4 border-[#E6A15C] pl-4 py-1 text-sm sm:text-base text-stone-600 italic font-['Newsreader'] leading-relaxed bg-[#FAF9F5] rounded-r-xl pr-4">
+            “Duomo sabe con precisión cuánto vende y produce. Ahora también puede entender, a escala continua, qué piensan sus clientes y por qué.”
+          </blockquote>
+
+          {/* Core Stat Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl">
+              <span className="text-[10px] uppercase font-bold text-stone-500 block">Red Territorial</span>
+              <span className="text-xl font-extrabold text-[#112A23] font-['Outfit']">90 sucursales</span>
+              <span className="text-[10px] text-stone-500 block">Misiones, Ctes, Chaco, Formosa</span>
             </div>
-            <div className="space-y-3 pt-1">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-[#1B4D3E] font-['Outfit']">DUOMO</h3>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                  Sweet Spot
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Fuerte arraigo identitario misionero y regional. Alta cremosidad y valor percibido.
-              </p>
-              <div className="space-y-1.5 pt-2 border-t border-stone-200 text-xs">
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Producto:</span>
-                  <span className="font-bold text-emerald-700">86 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Precio:</span>
-                  <span className="font-bold text-emerald-700">+54 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Fricción Principal:</span>
-                  <span className="text-amber-700 font-semibold">Stock & Filas pico</span>
-                </div>
-              </div>
+            <div className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl">
+              <span className="text-[10px] uppercase font-bold text-stone-500 block">Corpus Analítico</span>
+              <span className="text-xl font-extrabold text-[#1B4D3E] font-['Outfit']">2,884 opiniones</span>
+              <span className="text-[10px] text-stone-500 block">Google, IG, FB, TikTok</span>
             </div>
-            <button
-              onClick={() => onSelectPage("competition")}
-              className="mt-4 text-xs font-semibold text-[#1B4D3E] hover:underline flex items-center gap-1"
-            >
-              Ver análisis competitivo <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl">
+              <span className="text-[10px] uppercase font-bold text-stone-500 block">Net Sentiment</span>
+              <span className="text-xl font-extrabold text-emerald-700 font-['Outfit']">+68.4 pts</span>
+              <span className="text-[10px] text-stone-500 block">Frente a +36 Grido / +52 Crem.</span>
+            </div>
+            <div className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl">
+              <span className="text-[10px] uppercase font-bold text-stone-500 block">Framework AI</span>
+              <span className="text-xl font-extrabold text-stone-800 font-['Outfit']">ABSA + NER</span>
+              <span className="text-[10px] text-stone-500 block">Topic Modeling & DSS</span>
+            </div>
           </div>
 
-          {/* Grido */}
-          <div className="bg-[#FAF9F5] border border-stone-200 rounded-xl p-5 flex flex-col justify-between hover:border-blue-300 transition-colors shadow-xs">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-blue-800 font-['Outfit']">GRIDO</h3>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
-                  Accesibilidad
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Dominio masivo en precio, promociones de Club Grido y cobertura familiar.
-              </p>
-              <div className="space-y-1.5 pt-2 border-t border-stone-200 text-xs">
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Producto:</span>
-                  <span className="font-bold text-stone-600">28 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Precio:</span>
-                  <span className="font-bold text-blue-700">+84 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Fricción Principal:</span>
-                  <span className="text-rose-700 font-semibold">Gusto artificial / Grasa</span>
-                </div>
-              </div>
-            </div>
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
-              onClick={() => onSelectPage("competition")}
-              className="mt-4 text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1"
+              onClick={() => onSelectPage("overview")}
+              className="inline-flex items-center gap-2 bg-[#1B4D3E] hover:bg-[#143D32] text-white px-5 py-3 rounded-xl font-semibold text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer group"
             >
-              Ver contraste con Grido <ArrowRight className="w-3.5 h-3.5" />
+              <span>Explorar Overview Ejecutivo</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
-          </div>
 
-          {/* Cremolatti */}
-          <div className="bg-[#FAF9F5] border border-stone-200 rounded-xl p-5 flex flex-col justify-between hover:border-rose-300 transition-colors shadow-xs">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-rose-900 font-['Outfit']">CREMOLATTI</h3>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800">
-                  Gourmet Premium
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Estilo italiano tradicional y ambientación elegante, pero alta fricción de precio en el NEA.
-              </p>
-              <div className="space-y-1.5 pt-2 border-t border-stone-200 text-xs">
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Producto:</span>
-                  <span className="font-bold text-emerald-700">89 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Percepción Precio:</span>
-                  <span className="font-bold text-rose-700">-38 / 100</span>
-                </div>
-                <div className="flex justify-between text-stone-700 font-medium">
-                  <span>Fricción Principal:</span>
-                  <span className="text-rose-700 font-semibold">Precio por kilo elevado</span>
-                </div>
-              </div>
-            </div>
             <button
-              onClick={() => onSelectPage("competition")}
-              className="mt-4 text-xs font-semibold text-rose-800 hover:underline flex items-center gap-1"
+              onClick={() => onSelectPage("products")}
+              className="inline-flex items-center gap-2 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 px-4 py-3 rounded-xl font-semibold text-xs sm:text-sm transition-all cursor-pointer"
             >
-              Ver contraste con Cremolatti <ArrowRight className="w-3.5 h-3.5" />
+              <span>Flavor Intelligence</span>
+              <ChevronRight className="w-4 h-4 text-stone-400" />
+            </button>
+
+            <button
+              onClick={() => onSelectPage("reviews-explorer")}
+              className="inline-flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-3 rounded-xl font-semibold text-xs sm:text-sm transition-all cursor-pointer"
+            >
+              <span>Explorador de Reviews</span>
             </button>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* DSS Pipeline Concept */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-5 bg-white border border-stone-200 rounded-xl shadow-xs space-y-2">
-          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#1B4D3E] flex items-center justify-center font-bold text-sm">
-            1
-          </div>
-          <h4 className="font-bold text-stone-900 text-sm">Escucha Digital</h4>
-          <p className="text-xs text-stone-600 leading-relaxed">
-            Ingesta continua de reseñas en Google Maps, comentarios en Instagram, Facebook y TikTok.
-          </p>
-        </div>
-
-        <div className="p-5 bg-white border border-stone-200 rounded-xl shadow-xs space-y-2">
-          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#1B4D3E] flex items-center justify-center font-bold text-sm">
-            2
-          </div>
-          <h4 className="font-bold text-stone-900 text-sm">Aspect-Based NLP</h4>
-          <p className="text-xs text-stone-600 leading-relaxed">
-            Descomposición de cada opinión en aspectos específicos (Sabor, Atención, Stock, Medios de Pago).
-          </p>
-        </div>
-
-        <div className="p-5 bg-white border border-stone-200 rounded-xl shadow-xs space-y-2">
-          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#1B4D3E] flex items-center justify-center font-bold text-sm">
-            3
-          </div>
-          <h4 className="font-bold text-stone-900 text-sm">Señales & Evidencia</h4>
-          <p className="text-xs text-stone-600 leading-relaxed">
-            Identificación de fricciones operativas y validación empírica de lanzamientos como Chocolate Dubai.
-          </p>
-        </div>
-
-        <div className="p-5 bg-white border border-stone-200 rounded-xl shadow-xs space-y-2">
-          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#1B4D3E] flex items-center justify-center font-bold text-sm">
-            4
-          </div>
-          <h4 className="font-bold text-stone-900 text-sm">Decision Support</h4>
-          <p className="text-xs text-stone-600 leading-relaxed">
-            Soporte estructurado para Marketing y Gerencia sin automatizaciones ciegas.
-          </p>
-        </div>
-      </section>
-
-      {/* Academic Context Banner */}
-      <section className="bg-stone-100/90 border border-stone-300/80 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-white border border-stone-300 flex items-center justify-center text-stone-800 shrink-0 shadow-xs">
-            <GraduationCap className="w-6 h-6 text-[#1B4D3E]" />
-          </div>
+      {/* Connected Architecture Flow */}
+      <div className="bg-white border border-stone-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/70 pb-4">
           <div>
-            <div className="text-xs font-bold text-[#1B4D3E] uppercase tracking-wider">
-              Trabajo Práctico · AI for Business
-            </div>
-            <h3 className="text-base font-bold text-stone-900">
-              Master in Business & Technology (Universidad de San Andrés)
-            </h3>
-            <p className="text-xs text-stone-600">
-              Caso de estudio aplicado sobre Helados Duomo (Posadas, Misiones y Litoral Argentino).
+            <h2 className="text-xl font-bold text-stone-900 font-['Outfit']">
+              La Cadena de Consumer Intelligence Conectada
+            </h2>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Navegación jerárquica y reactiva desde la marca hasta las opiniones que sustentan cada señal de negocio.
             </p>
           </div>
+          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg self-start sm:self-auto">
+            7 Niveles de Drill-Down
+          </span>
         </div>
 
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-center">
+          {[
+            { step: "1. Marca", desc: "Duomo / Grido / Crem.", page: "competition" as NavPage },
+            { step: "2. Provincia", desc: "4 Provincias NEA", page: "geography" as NavPage },
+            { step: "3. Ciudad", desc: "Posadas, Ctes, etc.", page: "geography" as NavPage },
+            { step: "4. Sucursal", desc: "90 sucursales", page: "geography" as NavPage },
+            { step: "5. Sabor", desc: "Dubai, Pistacho...", page: "products" as NavPage },
+            { step: "6. Tópico", desc: "Stock, Atención...", page: "topics" as NavPage },
+            { step: "7. Reviews", desc: "Verbatims con URL", page: "reviews-explorer" as NavPage },
+          ].map((item, idx) => (
+            <button
+              key={item.step}
+              onClick={() => onSelectPage(item.page)}
+              className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl hover:border-[#1B4D3E] hover:bg-emerald-50/40 transition-all text-left group cursor-pointer"
+            >
+              <div className="text-[10px] font-bold text-[#1B4D3E] uppercase tracking-wider">{item.step}</div>
+              <div className="text-xs font-extrabold text-stone-900 font-['Outfit'] mt-1 truncate">{item.desc}</div>
+              <div className="text-[10px] text-stone-400 group-hover:text-[#1B4D3E] flex items-center gap-0.5 mt-2">
+                <span>Ver vista</span>
+                <ChevronRight className="w-2.5 h-2.5" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 3 Executive Value Pillars */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#1B4D3E] flex items-center justify-center">
+            <Zap className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
+            Monitoreo en Tiempo Casi Real
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed">
+            Detección temprana de quiebres de stock nocturnos, fallas en posnets o variaciones en la atención antes de que impacten en la venta del mes.
+          </p>
+          <button
+            onClick={() => onSelectPage("voice-of-customer")}
+            className="text-xs font-semibold text-[#1B4D3E] hover:underline flex items-center gap-1 pt-1 cursor-pointer"
+          >
+            <span>Ver Voice of Customer</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center">
+            <Target className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
+            Flavor & Launch Intelligence
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed">
+            Evaluación continua del rendimiento sensorial y operativo de nuevos lanzamientos como Chocolate Dubai frente a clásicos regionales consolidados.
+          </p>
+          <button
+            onClick={() => onSelectPage("products")}
+            className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1 pt-1 cursor-pointer"
+          >
+            <span>Ver Flavor Intelligence</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
+            Decision Support System (DSS)
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed">
+            Cruce de 4 dimensiones objetivas (ventas, satisfacción, operaciones y competencia) para respaldar decisiones de carta y marketing sin automatismos ciegos.
+          </p>
+          <button
+            onClick={() => onSelectPage("decision-lab")}
+            className="text-xs font-semibold text-blue-900 hover:underline flex items-center gap-1 pt-1 cursor-pointer"
+          >
+            <span>Ver Decision Lab</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+
+      {/* Academic Note Footer */}
+      <div className="p-4 bg-stone-100 border border-stone-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-stone-600">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="w-4 h-4 text-stone-500 shrink-0" />
+          <span>
+            Desarrollado para el Trabajo Práctico de <strong>AI for Business — Universidad de San Andrés (UdeSA)</strong>.
+          </span>
+        </div>
         <button
           onClick={() => onSelectPage("academic-report")}
-          className="px-4 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-800 text-xs font-bold border border-stone-300 shadow-xs transition-colors shrink-0"
+          className="font-bold text-[#1B4D3E] hover:underline shrink-0 cursor-pointer"
         >
-          Leer Informe Académico
+          Leer Paper Académico →
         </button>
-      </section>
+      </div>
     </div>
   );
 };

@@ -1,52 +1,54 @@
 import React, { useState } from "react";
-import { FilterState, TopicMetric } from "../types";
-import { PROTOTYPE_TOPICS } from "../data/prototypeMetrics";
+import { GlobalFilters } from "../types";
+import { NavPage } from "../components/Sidebar";
+import { computeTopicMetrics, computeDynamicOverviewMetrics, computeEvidenceContextData } from "../data/dynamicAnalyticsEngine";
+import { EvidenceContext } from "../components/EvidenceContext";
 import {
   Tags,
+  Search,
   Sparkles,
   TrendingUp,
   TrendingDown,
-  Layers,
-  Search,
+  ChevronRight,
   Filter,
-  BarChart2,
-  Swords,
-  MapPin,
+  Layers,
+  ArrowUpRight,
+  Radio,
+  IceCream,
+  Store,
+  Info,
 } from "lucide-react";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
 
 interface TopicsPageProps {
-  filters: FilterState;
+  filters: GlobalFilters;
+  onSelectPage?: (page: NavPage) => void;
+  onDrillDownTopic?: (topic: string) => void;
 }
 
-export const TopicsPage: React.FC<TopicsPageProps> = ({ filters }) => {
+export const TopicsPage: React.FC<TopicsPageProps> = ({
+  filters,
+  onSelectPage,
+  onDrillDownTopic,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Todas");
-  const [searchTopic, setSearchTopic] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredTopics = PROTOTYPE_TOPICS.filter((t) => {
-    const matchesCat = selectedCategory === "Todas" || t.category === selectedCategory;
-    const matchesSearch = t.name.toLowerCase().includes(searchTopic.toLowerCase()) ||
-      t.topPhrases.some((p) => p.toLowerCase().includes(searchTopic.toLowerCase()));
-    return matchesCat && matchesSearch;
+  const topics = computeTopicMetrics(filters);
+  const overview = computeDynamicOverviewMetrics(filters);
+
+  const filteredTopics = topics.filter((t) => {
+    const matchCat = selectedCategory === "Todas" || t.category === selectedCategory;
+    const matchSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchCat && matchSearch;
   });
 
-  const emergingTopics = PROTOTYPE_TOPICS.filter((t) => t.isEmerging);
-
-  const brandComparisonData = PROTOTYPE_TOPICS.slice(0, 6).map((t) => ({
-    name: t.name,
-    Duomo: t.duomoScore,
-    Grido: t.gridoScore,
-    Cremolatti: t.cremolattiScore,
-  }));
+  const handleTopicClick = (topicName: string) => {
+    if (onDrillDownTopic) {
+      onDrillDownTopic(topicName);
+    } else if (onSelectPage) {
+      onSelectPage("reviews-explorer");
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-['Plus_Jakarta_Sans']">
@@ -55,181 +57,150 @@ export const TopicsPage: React.FC<TopicsPageProps> = ({ filters }) => {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-extrabold text-[#112A23] font-['Outfit']">
-              Topic Intelligence
+              Topic Intelligence & BERTopic
             </h2>
             <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-              BERTopic & Semantic Clustering
+              Modelado No Supervisado de Temas
             </span>
           </div>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Descubrimiento automático de temas y tópicos latentes en la voz digital del consumidor sin sesgo previo.
+            Descubrimiento automático de temas recurrentes, fricciones operativas y demandas emergentes de clientes.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Buscar tema o frase..."
-              value={searchTopic}
-              onChange={(e) => setSearchTopic(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-800 focus:outline-none focus:border-[#1B4D3E]"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Emerging Topics Banner */}
-      <div className="bg-gradient-to-r from-[#FAF9F5] to-amber-50/50 border border-amber-200/80 rounded-2xl p-5 shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            <h3 className="font-bold text-stone-900 text-sm font-['Outfit']">
-              Tópicos Emergentes & Tendencias Rápidas
-            </h3>
-          </div>
-          <span className="text-[10px] font-bold text-amber-800 uppercase bg-amber-100 px-2 py-0.5 rounded">
-            Detección de Anomalías NLP
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-stone-500">Muestra Activa:</span>
+          <span className="font-bold text-stone-900 bg-stone-100 px-2.5 py-1 rounded-lg">
+            {overview.totalAnalyzedConversations} opiniones
           </span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {emergingTopics.map((top) => (
-            <div key={top.id} className="p-3 bg-white border border-amber-200/80 rounded-xl space-y-1.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-stone-900">{top.name}</span>
-                <span className="text-xs font-bold text-emerald-700 flex items-center">
-                  <TrendingUp className="w-3.5 h-3.5" /> +{top.trend}%
-                </span>
-              </div>
-              <p className="text-[11px] text-stone-600">
-                {top.sentimentScore > 0 ? "Fuerte tracción positiva." : "Alerta de fricción operativa creciente."}
-              </p>
-              <div className="text-[10px] text-stone-400 truncate">
-                Frases: {top.topPhrases.join(" · ")}
-              </div>
-            </div>
+      {/* Concept Note */}
+      <div className="bg-[#FAF9F5] border border-stone-200 rounded-xl p-4 text-xs text-stone-700 leading-relaxed flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-[#1B4D3E] text-white flex items-center justify-center font-bold shrink-0">
+          NLP
+        </div>
+        <div>
+          <strong>¿Cómo funciona el Topic Modeling?</strong> Agrupa semánticamente opiniones similares utilizando embeddings densos y algoritmos de clustering (HDBSCAN), identificando tópicos reales sin necesidad de taxonomías rígidas previas.
+        </div>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-stone-400 font-bold text-[10px] uppercase mr-1">Categoría:</span>
+          {["Todas", "Producto", "Servicio", "Operaciones", "Precio", "Infraestructura"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedCategory === cat
+                  ? "bg-[#1B4D3E] text-white shadow-2xs"
+                  : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+              }`}
+            >
+              {cat}
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* Category filter pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        {["Todas", "Producto", "Servicio", "Precio", "Operaciones", "Infraestructura"].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-colors ${
-              selectedCategory === cat
-                ? "bg-[#1B4D3E] text-white shadow-xs"
-                : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Topics Table / Cards */}
-      <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-xs">
-        <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
-          <h3 className="font-bold text-stone-900 text-sm font-['Outfit']">
-            Catálogo de Tópicos Descubiertos ({filteredTopics.length})
-          </h3>
-          <span className="text-xs text-stone-500 font-medium">Ordenado por volumen de mención</span>
+        <div className="relative w-full sm:w-64">
+          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Buscar tópico o palabra..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 bg-[#FAF9F5] border border-stone-200 rounded-xl text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#1B4D3E]"
+          />
         </div>
+      </div>
 
-        <div className="divide-y divide-stone-100 text-xs">
-          {filteredTopics.map((top) => {
-            const isPos = top.sentimentScore > 0;
-            return (
-              <div key={top.id} className="p-4 sm:p-5 hover:bg-stone-50/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-stone-900 text-sm">{top.name}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
-                      {top.category}
-                    </span>
-                    {top.isEmerging && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                        Emergente
+      {/* Topics Grid: Clickable Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredTopics.map((topic) => {
+          const isPositive = topic.sentimentScore > 0;
+          return (
+            <button
+              key={topic.id}
+              onClick={() => handleTopicClick(topic.name)}
+              className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#1B4D3E] transition-all text-left group cursor-pointer space-y-3.5 relative flex flex-col justify-between"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
+                    {topic.category}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {topic.isEmerging && (
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-100 border border-amber-300/80 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                        <Sparkles className="w-2.5 h-2.5" /> Emergente
                       </span>
                     )}
-                  </div>
-                  <div className="text-stone-500 text-[11px] flex flex-wrap items-center gap-2">
-                    <span>Menciones: <strong>{top.mentionsCount}</strong> ({top.percentage}% de la muestra)</span>
-                    <span>·</span>
-                    <span>Frases clave: <em className="text-stone-700">{top.topPhrases.join(", ")}</em></span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 shrink-0">
-                  {/* Trend */}
-                  <div className="text-right">
-                    <div className="text-[10px] text-stone-400 font-medium">Evolución</div>
-                    <div
-                      className={`font-bold flex items-center justify-end ${
-                        top.trend > 0 ? "text-emerald-700" : "text-rose-700"
-                      }`}
-                    >
-                      {top.trend > 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
-                      {top.trend > 0 ? `+${top.trend}%` : `${top.trend}%`}
-                    </div>
-                  </div>
-
-                  {/* Sentiment Score */}
-                  <div className="text-right">
-                    <div className="text-[10px] text-stone-400 font-medium">Score Neto</div>
                     <span
-                      className={`inline-block font-black px-2.5 py-1 rounded text-xs ${
-                        isPos
+                      className={`text-xs font-black px-2 py-0.5 rounded ${
+                        isPositive
                           ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                           : "bg-rose-100 text-rose-800 border border-rose-200"
                       }`}
                     >
-                      {isPos ? `+${top.sentimentScore}` : top.sentimentScore}
+                      {isPositive ? `+${topic.sentimentScore}` : topic.sentimentScore} Net
                     </span>
                   </div>
                 </div>
+
+                <h3 className="text-base font-bold text-stone-900 font-['Outfit'] group-hover:text-[#1B4D3E] transition-colors leading-snug">
+                  {topic.name}
+                </h3>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="p-2 bg-[#FAF9F5] border border-stone-100 rounded-lg">
+                    <span className="text-[10px] text-stone-400 block font-medium">Menciones</span>
+                    <span className="text-sm font-extrabold text-stone-900 font-['Outfit']">
+                      {topic.mentionsCount} opiniones
+                    </span>
+                    <span className="text-[10px] text-stone-500 block">{topic.percentage}% del corpus</span>
+                  </div>
+
+                  <div className="p-2 bg-[#FAF9F5] border border-stone-100 rounded-lg">
+                    <span className="text-[10px] text-stone-400 block font-medium">Tendencia</span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {topic.trend > 0 ? (
+                        <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <TrendingDown className="w-3.5 h-3.5 text-rose-600" />
+                      )}
+                      <span className={`text-xs font-bold ${topic.trend > 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                        {topic.trend > 0 ? `+${topic.trend}%` : `${topic.trend}%`}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-stone-400 block">vs período anterior</span>
+                  </div>
+                </div>
+
+                {/* Sources breakdown */}
+                <div className="pt-2 text-[11px] text-stone-500 space-y-1">
+                  <div className="flex justify-between font-medium">
+                    <span>Origen de las opiniones:</span>
+                    <span className="font-semibold text-stone-700">Google 64% · IG 24% · FB 12%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden flex">
+                    <div style={{ width: "64%" }} className="bg-[#1B4D3E] h-full" />
+                    <div style={{ width: "24%" }} className="bg-pink-600 h-full" />
+                    <div style={{ width: "12%" }} className="bg-blue-600 h-full" />
+                  </div>
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Topics by Brand Chart */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
-              Topic Sentiment Comparativo por Marca (Duomo vs Grido vs Cremolatti)
-            </h3>
-            <p className="text-xs text-stone-500">
-              Score de percepción (-100 a +100) en los 6 tópicos principales.
-            </p>
-          </div>
-          <span className="text-[11px] font-semibold text-stone-500 bg-stone-100 px-2 py-1 rounded">
-            Evaluación Multimarca
-          </span>
-        </div>
-
-        <div className="h-72 w-full text-xs">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={brandComparisonData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="name" stroke="#64748b" fontSize={11} angle={-10} textAnchor="end" />
-              <YAxis stroke="#64748b" fontSize={11} domain={[-60, 100]} />
-              <Tooltip
-                contentStyle={{ backgroundColor: "#FAF9F5", borderColor: "#e2e8f0", borderRadius: "12px", fontSize: "12px" }}
-              />
-              <Legend />
-              <Bar dataKey="Duomo" fill="#1B4D3E" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Grido" fill="#2563EB" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Cremolatti" fill="#881337" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+              {/* Action drill-down button */}
+              <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs font-semibold text-[#1B4D3E]">
+                <span>Ver reviews que sustentan este tópico</span>
+                <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

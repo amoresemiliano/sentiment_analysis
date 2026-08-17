@@ -1,7 +1,7 @@
 export type Brand = "Duomo" | "Grido" | "Cremolatti" | "Todas";
 export type SentimentLabel = "positive" | "neutral" | "negative";
 export type DataType = "real" | "prototype";
-export type Source = "Google" | "Instagram" | "Facebook" | "TikTok" | "YouTube" | "Tripadvisor" | "Other";
+export type Source = "Google" | "Instagram" | "Facebook" | "TikTok" | "YouTube" | "Tripadvisor" | "Todas";
 export type Province = "Misiones" | "Corrientes" | "Chaco" | "Formosa" | "Todas";
 
 export interface AspectSentiment {
@@ -15,6 +15,8 @@ export interface Review {
   id: string;
   brand: "Duomo" | "Grido" | "Cremolatti";
   branch?: string;
+  branchName?: string;
+  branchId?: string;
   city: string;
   province: "Misiones" | "Corrientes" | "Chaco" | "Formosa";
   country: "Argentina";
@@ -22,8 +24,11 @@ export interface Review {
   date: string;
   rating?: number;
   text: string;
+  author?: string;
+  flavor?: string;
   dataType: DataType;
   sourceUrl?: string;
+  url?: string;
   sentiment: {
     label: SentimentLabel;
     score: number; // -1 to 1
@@ -32,15 +37,80 @@ export interface Review {
   topics: string[];
 }
 
-export interface FilterState {
-  period: string;
-  brand: Brand;
-  province: Province;
-  branch: string;
-  source: string;
-  sentiment: string;
-  topic: string;
+export interface GlobalFilters {
+  brand: string | null;      // "Duomo" | "Grido" | "Cremolatti" | null
+  province: string | null;   // "Misiones" | "Corrientes" | "Chaco" | "Formosa" | null
+  city: string | null;       // "Posadas" | "Oberá" | "Corrientes" | etc. | null
+  branch: string | null;     // Branch ID or name | null
+  flavor: string | null;     // "Chocolate Dubai" | "Pistacho" | etc. | null
+  topic: string | null;      // "Disponibilidad" | "Atención" | etc. | null
+  sentiment: string | null;  // "positive" | "neutral" | "negative" | null
+  source: string | null;     // "Google" | "Instagram" | "Facebook" | "TikTok" | null
+  period: string | null;     // "Últimos 90 días" | "Últimos 30 días" | "Año Móvil" | null
   searchQuery: string;
+}
+
+export type FilterState = GlobalFilters;
+
+export interface Branch {
+  id: string;
+  brand: "Duomo" | "Grido" | "Cremolatti";
+  name: string;
+  city: string;
+  province: "Misiones" | "Corrientes" | "Chaco" | "Formosa";
+  address: string;
+  reviewsCount?: number;
+  sentimentScore?: number;
+  topIssue?: string;
+  googleProfile?: {
+    rating: number;
+    totalReviews: number;
+    url?: string;
+    lastChecked?: string;
+    dataType: "real" | "prototype";
+  };
+  analyzedCorpus: {
+    googleReviews: number;
+    socialComments: number;
+    totalAnalyzed: number;
+  };
+  sentiment: {
+    positivePct: number;
+    neutralPct: number;
+    negativePct: number;
+    netScore: number; // -100 to +100
+  };
+  topTopic: string;
+  mainFriction: string;
+  trend: number;
+  topFlavorsMentioned: string[];
+}
+
+export interface EvidenceContextData {
+  mentionCount: number;
+  shareOfAnalyzedCorpus: number; // Percentage e.g. 17.5
+  analyzedCorpusTotal: number;   // e.g. 80
+  publicReviewsTotal?: number;   // e.g. 950 (Google Reviews public count)
+  googleRating?: number;         // e.g. 4.7
+  sourcesCount: number;          // e.g. 3
+  periodLabel: string;           // e.g. "Últimos 90 días"
+  signalStrength: "Alta" | "Media" | "Baja / Muestra reducida";
+  dataType: "real" | "prototype" | "derived";
+}
+
+export interface DynamicOverviewMetrics {
+  totalAnalyzedConversations: number;
+  publicReviewsContextTotal: number;
+  positivePct: number;
+  neutralPct: number;
+  negativePct: number;
+  netSentimentScore: number; // -100 to +100
+  isLowSample: boolean;
+  topTopic: string;
+  topFriction: string;
+  executiveInsight: string;
+  sourcesBreakdown: { name: string; count: number; pct: number }[];
+  timeline: { month: string; Duomo: number; Grido: number; Cremolatti: number }[];
 }
 
 export interface TopicMetric {
@@ -56,6 +126,19 @@ export interface TopicMetric {
   gridoScore: number;
   cremolattiScore: number;
   topPhrases: string[];
+  sourcesDistribution?: { name: string; pct: number }[];
+  topFlavor?: string;
+  topBranch?: string;
+}
+
+export interface SentimentTopicMatrixRow {
+  topic: string;
+  category: string;
+  positiveCount: number;
+  neutralCount: number;
+  negativeCount: number;
+  totalMentions: number;
+  netScore: number;
 }
 
 export interface ProductInsight {
@@ -73,6 +156,16 @@ export interface ProductInsight {
   provincesDistribution: { province: string; mentions: number }[];
   salesIndex: number; // Simulated commercial metric
   description: string;
+  topicsMatrix?: { topic: string; mentions: number; sentimentScore: number }[];
+}
+
+export interface RegionalBranchSummary {
+  name: string;
+  city: string;
+  reviewsCount: number;
+  sentimentScore: number;
+  trend: number;
+  topIssue: string;
 }
 
 export interface RegionalMetric {
@@ -86,14 +179,7 @@ export interface RegionalMetric {
   mainFriction: string;
   sentimentIndex: number;
   topTopics: string[];
-  branches: {
-    name: string;
-    city: string;
-    reviewsCount: number;
-    sentimentScore: number;
-    trend: number;
-    topIssue: string;
-  }[];
+  branches: RegionalBranchSummary[];
 }
 
 export interface PromotionMetric {
@@ -124,7 +210,7 @@ export interface CompetitiveHypothesis {
   title: string;
   brandFocus: "Grido" | "Cremolatti" | "Duomo";
   hypothesisText: string;
-  status: "Supported" | "Mixed" | "Not Supported";
+  status: "Supported" | "Mixed" | "Not Conclusive";
   statusDescription: string;
   priceMentionsPct: number;
   promotionMentionsPct: number;

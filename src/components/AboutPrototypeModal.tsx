@@ -11,7 +11,7 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#FAF9F5] border border-stone-300 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-[#FAF9F5] border border-stone-300 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col font-['Plus_Jakarta_Sans']">
         {/* Header */}
         <div className="px-6 py-5 bg-[#1B4D3E] text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -21,20 +21,20 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
             <div>
               <h2 className="text-lg font-bold font-['Outfit'] tracking-tight">Transparencia Metodológica y Datos</h2>
               <p className="text-xs text-emerald-200/80">
-                Duomo Consumer Intelligence · Master in Business & Technology (UdeSA)
+                El Sabor de la IA by Duomo Helados · Master in Business & Technology (UdeSA)
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-stone-300 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800/60 transition-colors"
+            className="text-stone-300 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800/60 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-6 text-sm text-stone-700 leading-relaxed font-['Plus_Jakarta_Sans']">
+        <div className="p-6 overflow-y-auto space-y-6 text-sm text-stone-700 leading-relaxed">
           <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-4 flex gap-3.5">
             <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
             <div>
@@ -80,8 +80,8 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
               <div className="p-3 bg-stone-100/70 border border-stone-200/80 rounded-xl">
                 <div className="text-xs text-stone-500 font-medium">Cobertura Fuentes</div>
-                <div className="text-base font-bold text-stone-800 mt-0.5">5 Canales</div>
-                <div className="text-[10px] text-stone-400">Google, IG, FB, TT, YT</div>
+                <div className="text-base font-bold text-stone-800 mt-0.5">4 Canales</div>
+                <div className="text-[10px] text-stone-400">Google, IG, FB, TikTok</div>
               </div>
               <div className="p-3 bg-stone-100/70 border border-stone-200/80 rounded-xl">
                 <div className="text-xs text-stone-500 font-medium">Cobertura NEA</div>
@@ -90,8 +90,8 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
               </div>
               <div className="p-3 bg-stone-100/70 border border-stone-200/80 rounded-xl">
                 <div className="text-xs text-stone-500 font-medium">Red Duomo</div>
-                <div className="text-base font-bold text-stone-800 mt-0.5">~90 Sucursales</div>
-                <div className="text-[10px] text-stone-400">Muestra en MVP</div>
+                <div className="text-base font-bold text-stone-800 mt-0.5">90 Sucursales</div>
+                <div className="text-[10px] text-stone-400">Red territorial total</div>
               </div>
               <div className="p-3 bg-stone-100/70 border border-stone-200/80 rounded-xl">
                 <div className="text-xs text-stone-500 font-medium">Confianza NLP</div>
@@ -108,11 +108,11 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
             <ul className="text-xs text-stone-600 space-y-1.5">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Validación conceptual y diseño de UX/UI ejecutiva completada.</span>
+                <span>Segunda iteración completada: Filtros globales reactivos y dimensiones conectadas.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Taxonomía de Aspect-Based Sentiment Analysis (ABSA) definida para el negocio heladero.</span>
+                <span>Desglose de peso de la señal con distinción clara entre denominador analítico y reseñas públicas.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-stone-400 shrink-0" />
@@ -126,7 +126,7 @@ export const AboutPrototypeModal: React.FC<AboutPrototypeModalProps> = ({ isOpen
         <div className="px-6 py-4 bg-stone-100 border-t border-stone-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-[#1B4D3E] hover:bg-[#143B30] text-white font-medium text-xs transition-colors shadow-xs"
+            className="px-5 py-2 rounded-xl bg-[#1B4D3E] hover:bg-[#143B30] text-white font-medium text-xs transition-colors shadow-xs cursor-pointer"
           >
             Entendido
           </button>

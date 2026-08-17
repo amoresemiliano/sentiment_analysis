@@ -15,7 +15,7 @@ export const AcademicReportPage: React.FC = () => {
         </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-['Outfit'] text-stone-900 tracking-tight leading-[1.2]">
-          Duomo Consumer Intelligence: Transformación de la Voz Digital del Consumidor en Señales Estratégicas mediante NLP y Aspect-Based Sentiment Analysis
+          El Sabor de la IA by Duomo Helados: Transformación de la Voz Digital del Consumidor en Señales Estratégicas mediante NLP y Aspect-Based Sentiment Analysis
         </h1>
 
         <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-stone-600 pt-2 font-medium">
@@ -23,7 +23,7 @@ export const AcademicReportPage: React.FC = () => {
             <strong>Autores:</strong> Alumnos MBT (Caso de Aplicación Empresarial)
           </div>
           <div>
-            <strong>Organización Objeto:</strong> Helados Duomo (Posadas, Misiones / NEA)
+            <strong>Organización Objeto:</strong> Helados Duomo (Posadas, Misiones / NEA - 90 Sucursales)
           </div>
           <div>
             <strong>Fecha:</strong> Período Académico 2024 / 2026
@@ -39,7 +39,7 @@ export const AcademicReportPage: React.FC = () => {
             1. Abstract / Resumen Ejecutivo
           </h2>
           <p className="italic leading-relaxed text-stone-800">
-            La industria gastronómica y de retail heladero dispone de abundantes sistemas transaccionales (ERP, CRM, POS) que explican con precisión <em>qué</em> y <em>cuánto</em> se vende por punto de venta, pero carecen de visibilidad sistemática sobre <em>por qué</em> los consumidores eligen, recomiendan o abandonan una marca. Este trabajo presenta el diseño, arquitectura y validación de <strong>Duomo Consumer Intelligence</strong>, un <em>Decision Support System (DSS)</em> basado en Inteligencia Artificial y Procesamiento de Lenguaje Natural (NLP). El sistema ingesta reseñas públicas no estructuradas de Google Business Profiles, Instagram, Facebook y TikTok en el Nordeste Argentino (Misiones, Corrientes, Chaco y Formosa), aplicando <strong>Aspect-Based Sentiment Analysis (ABSA)</strong> y <strong>Topic Modeling</strong> no supervisado para contrastar empíricamente hipótesis competitivas frente a Grido y Cremolatti. Se demuestra cómo transformar texto libre en señales de toma de decisión para la formulación de productos, gestión de disponibilidad y asignación de recursos operativos.
+            La industria gastronómica y de retail heladero dispone de abundantes sistemas transaccionales (ERP, CRM, POS) que explican con precisión <em>qué</em> y <em>cuánto</em> se vende por punto de venta, pero carecen de visibilidad sistemática sobre <em>por qué</em> los consumidores eligen, recomiendan o abandonan una marca. Este trabajo presenta el diseño, arquitectura y validación de <strong>El Sabor de la IA by Duomo Helados</strong>, un <em>Decision Support System (DSS)</em> basado en Inteligencia Artificial y Procesamiento de Lenguaje Natural (NLP). El sistema ingesta reseñas públicas no estructuradas de Google Business Profiles, Instagram, Facebook y TikTok en el Nordeste Argentino (Misiones, Corrientes, Chaco y Formosa), aplicando <strong>Aspect-Based Sentiment Analysis (ABSA)</strong> y <strong>Topic Modeling</strong> no supervisado para contrastar empíricamente hipótesis competitivas frente a Grido y Cremolatti. Se demuestra cómo transformar texto libre en señales de toma de decisión para la formulación de productos, gestión de disponibilidad y asignación de recursos operativos a lo largo de sus <strong>90 sucursales</strong>.
           </p>
         </section>
 
@@ -49,7 +49,7 @@ export const AcademicReportPage: React.FC = () => {
             2. Introducción y Definición del Problema de Negocio
           </h2>
           <p>
-            Helados Duomo es la cadena líder de heladerías artesanales del Nordeste Argentino (NEA), con una red de aproximadamente 90 puntos de venta distribuidos entre Misiones, Corrientes, Chaco y Formosa. La compañía opera con una planta central de producción en Posadas, Misiones, abasteciendo a locales propios y franquicias con un esquema logístico de frío intensivo.
+            Helados Duomo es la cadena líder de heladerías artesanales del Nordeste Argentino (NEA), con una red consolidada de <strong>90 sucursales</strong> distribuidas entre Misiones, Corrientes, Chaco y Formosa. La compañía opera con una planta central de producción en Posadas, Misiones, abasteciendo a locales propios y franquicias con un esquema logístico de frío intensivo.
           </p>
           <p>
             Históricamente, la toma de decisiones sobre desarrollo de nuevos sabores, promociones, horarios de atención y reformas de infraestructura se ha apoyado en métricas de venta bruta, rotación de inventario y el criterio empírico de la gerencia. Sin embargo, este enfoque presenta tres limitaciones críticas:
@@ -91,7 +91,7 @@ export const AcademicReportPage: React.FC = () => {
             <div className="p-4 bg-white border border-stone-200 rounded-xl space-y-1">
               <h4 className="font-bold text-[#1B4D3E]">Extracción de Entidades Nombradas (NER)</h4>
               <p className="text-stone-600 leading-relaxed">
-                Identifica sucursales específicas, ciudades, sabores puntuales y turnos horarios en lenguaje coloquial propio de la región litoral argentina.
+                Identifica sucursales específicas de las 90 existentes, ciudades, sabores puntuales y turnos horarios en lenguaje coloquial propio de la región litoral argentina.
               </p>
             </div>
             <div className="p-4 bg-white border border-stone-200 rounded-xl space-y-1">
@@ -122,14 +122,14 @@ export const AcademicReportPage: React.FC = () => {
             <div className="p-4 bg-[#FAF9F5] border border-stone-200 rounded-xl space-y-1.5">
               <div className="font-bold text-stone-900 text-sm">B. Eficiencia Operativa y Retención de Clientes</div>
               <p className="text-stone-600 leading-relaxed">
-                Detección oportuna de cuellos de botella en turnos específicos (fines de semana 19:00 a 24:00 hs) y fallas recurrentes de infraestructura de pago digital (POS/QR) antes de que impacten en el churn o pérdida de lealtad.
+                Detección oportuna de cuellos de botella en turnos específicos (fines de semana 19:00 a 24:00 hs) y fallas recurrentes de infraestructura de pago digital (POS/QR) antes de que impacten en el churn o pérdida de lealtad en las 90 sucursales.
               </p>
             </div>
 
             <div className="p-4 bg-[#FAF9F5] border border-stone-200 rounded-xl space-y-1.5">
               <div className="font-bold text-stone-900 text-sm">C. Inteligencia de Posicionamiento Competitivo</div>
               <p className="text-stone-600 leading-relaxed">
-                Monitoreo continuo de la propuesta de valor relativa: Duomo consolida su <em>sweet spot</em> combinando calidad organoléptica comparable a Cremolatti con un nivel de accesibilidad económica y cobertura territorial superior.
+                Monitoreo continuo de la propuesta de valor relativa: Duomo consolida su <em>sweet spot</em> combinando calidad organoléptica comparable a Cremolatti con un nivel de accesibilidad económica y cobertura territorial superior (90 sucursales vs 18 de Cremolatti).
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export const AcademicReportPage: React.FC = () => {
             6. Conclusiones, Limitaciones y Consideraciones Éticas
           </h2>
           <p>
-            <strong>Conclusiones:</strong> La integración de la voz digital del consumidor mediante NLP estructurado proporciona a Helados Duomo una ventaja analítica diferencial, cerrando la brecha entre los datos transaccionales de venta y la experiencia real del cliente.
+            <strong>Conclusiones:</strong> La integración de la voz digital del consumidor mediante NLP estructurado proporciona a Helados Duomo una ventaja analítica diferencial, cerrando la brecha entre los datos transaccionales de venta y la experiencia real del cliente a lo largo de sus 90 sucursales.
           </p>
           <p>
             <strong>Limitaciones Metodológicas:</strong>
@@ -200,7 +200,7 @@ export const AcademicReportPage: React.FC = () => {
               Davenport, T., & Ronanki, R. (2018). <em>Artificial Intelligence for the Real World</em>. Harvard Business Review, 96(1), 108-116.
             </li>
             <li>
-              Helados Duomo (2024). <em>Portal Institucional y Red de Sucursales</em>. https://www.duomohelados.com.ar/
+              Helados Duomo (2024). <em>Portal Institucional y Red de 90 Sucursales</em>. https://www.duomohelados.com.ar/
             </li>
           </ol>
         </section>

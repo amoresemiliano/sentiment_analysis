@@ -27,15 +27,15 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleMobileMenu}
-          className="p-2 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 md:hidden transition-colors"
+          className="p-2 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 md:hidden transition-colors cursor-pointer"
           aria-label="Abrir menú"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="text-stone-400 font-medium text-xs hidden sm:inline">
-            Duomo Consumer Intelligence /
+          <div className="text-stone-400 font-medium text-xs hidden sm:inline truncate max-w-[220px]">
+            El Sabor de la IA /
           </div>
           <h1 className="text-base sm:text-lg font-bold text-stone-900 font-['Outfit'] tracking-tight">
             {currentItem?.label || "Consumer Intelligence"}
@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
           <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por sabor, sucursal, queja..."
+            placeholder="Buscar sabor, sucursal, queja..."
             value={searchQuery}
             onChange={(e) => {
               onSearchChange(e.target.value);
@@ -65,26 +65,26 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Prototype Badge */}
         <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[#14532D] border border-emerald-200/80 text-[11px] font-semibold">
           <Sparkles className="w-3 h-3 text-[#15803D]" />
-          <span>AI Business Intelligence Prototype</span>
+          <span>AI Consumer Intelligence</span>
         </div>
 
         {/* Academic Badge */}
         <button
           onClick={() => onSelectPage("academic-report")}
-          className="hidden xl:flex items-center gap-1 px-2 py-1 rounded-lg bg-stone-100 hover:bg-stone-200/80 text-stone-700 border border-stone-200 text-[11px] font-medium transition-colors"
+          className="hidden xl:flex items-center gap-1 px-2 py-1 rounded-lg bg-stone-100 hover:bg-stone-200/80 text-stone-700 border border-stone-200 text-[11px] font-medium transition-colors cursor-pointer"
           title="Ver entrega académica para Universidad de San Andrés"
         >
           <GraduationCap className="w-3.5 h-3.5 text-stone-500" />
-          <span>UdeSA · MBT</span>
+          <span>UdeSA · AI for Business</span>
         </button>
 
         {/* Info button */}
         <button
           onClick={onOpenAboutModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold border border-stone-200/80 transition-colors shadow-2xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold border border-stone-200/80 transition-colors shadow-2xs cursor-pointer"
         >
           <Info className="w-3.5 h-3.5 text-[#1B4D3E]" />
-          <span className="hidden md:inline">Transparencia</span>
+          <span className="hidden md:inline">Metodología & Datos</span>
         </button>
       </div>
     </header>

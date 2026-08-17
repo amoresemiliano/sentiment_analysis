@@ -1,16 +1,22 @@
 import React from "react";
+import { GlobalFilters, SentimentLabel } from "../types";
 import { NavPage } from "../components/Sidebar";
-import { FilterState } from "../types";
+import { computeDynamicOverviewMetrics, computeSentimentTopicMatrix } from "../data/dynamicAnalyticsEngine";
 import {
-  Sparkles,
+  MessageSquare,
   TrendingUp,
-  AlertCircle,
-  CheckCircle2,
+  ThumbsUp,
+  ThumbsDown,
+  Sparkles,
+  AlertTriangle,
+  Layers,
   ArrowUpRight,
   ArrowDownRight,
-  Layers,
-  ArrowRight,
-  TrendingDown,
+  ChevronRight,
+  Star,
+  Globe,
+  Radio,
+  Building2,
   Info,
 } from "lucide-react";
 import {
@@ -24,292 +30,293 @@ import {
   Legend,
   BarChart,
   Bar,
+  Cell,
 } from "recharts";
 
 interface OverviewPageProps {
-  filters: FilterState;
+  filters: GlobalFilters;
   onSelectPage: (page: NavPage) => void;
+  onDrillDownSentiment?: (sentiment: SentimentLabel) => void;
+  onDrillDownTopic?: (topic: string) => void;
 }
 
-const TREND_DATA = [
-  { month: "Nov 23", positive: 71, neutral: 19, negative: 10 },
-  { month: "Dic 23", positive: 73, neutral: 18, negative: 9 },
-  { month: "Ene 24", positive: 70, neutral: 20, negative: 10 },
-  { month: "Feb 24", positive: 74, neutral: 17, negative: 9 },
-  { month: "Mar 24", positive: 78, neutral: 15, negative: 7 },
-  { month: "Abr 24", positive: 76, neutral: 16, negative: 8 },
-];
+export const OverviewPage: React.FC<OverviewPageProps> = ({
+  filters,
+  onSelectPage,
+  onDrillDownSentiment,
+  onDrillDownTopic,
+}) => {
+  const metrics = computeDynamicOverviewMetrics(filters);
+  const topicMatrix = computeSentimentTopicMatrix(filters);
+  const topTopics = topicMatrix.slice(0, 5);
 
-const TOPIC_SHARE_DATA = [
-  { name: "Sabor & Calidad", share: 38, sentiment: 84 },
-  { name: "Atención al Cliente", share: 27, sentiment: 42 },
-  { name: "Precio / Valor", share: 23, sentiment: 28 },
-  { name: "Disponibilidad / Stock", share: 15, sentiment: -38 },
-  { name: "Chocolate Dubai", share: 14, sentiment: 92 },
-  { name: "Tiempos de Espera", share: 13, sentiment: -46 },
-  { name: "Ambiente & Salón", share: 11, sentiment: 68 },
-];
+  const handleSentimentClick = (sentiment: SentimentLabel) => {
+    if (onDrillDownSentiment) {
+      onDrillDownSentiment(sentiment);
+    } else {
+      onSelectPage("reviews-explorer");
+    }
+  };
 
-export const OverviewPage: React.FC<OverviewPageProps> = ({ filters, onSelectPage }) => {
+  const handleTopicClick = (topic: string) => {
+    if (onDrillDownTopic) {
+      onDrillDownTopic(topic);
+    } else {
+      onSelectPage("reviews-explorer");
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-['Plus_Jakarta_Sans']">
-      {/* Hero Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-stone-200 p-6 rounded-2xl shadow-xs">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#112A23] font-['Outfit'] tracking-tight">
-              Consumer Pulse
-            </h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-              Live Signals
-            </span>
-          </div>
-          <p className="text-sm text-stone-600 mt-1">
-            Lo que nuestros clientes están diciendo en el NEA, convertido en señales accionables de negocio.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onSelectPage("decision-lab")}
-            className="px-4 py-2 rounded-xl bg-[#1B4D3E] hover:bg-[#143D32] text-white text-xs font-bold transition-colors shadow-xs flex items-center gap-1.5"
-          >
-            <span>Ir a Decision Lab</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-        {/* Analyzed */}
-        <div className="p-4 bg-white border border-stone-200 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-            Opiniones Analizadas
-          </div>
-          <div className="text-2xl font-extrabold text-stone-900 font-['Outfit'] mt-1">1,284</div>
-          <div className="text-[10px] text-emerald-700 font-medium flex items-center gap-0.5 mt-1">
-            <ArrowUpRight className="w-3 h-3" /> +14% vs trimestre anterior
-          </div>
-        </div>
-
-        {/* Positive */}
-        <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
-            Sentimiento Positivo
-          </div>
-          <div className="text-2xl font-extrabold text-emerald-900 font-['Outfit'] mt-1">74%</div>
-          <div className="text-[10px] text-emerald-700 font-medium mt-1">950 menciones favorables</div>
-        </div>
-
-        {/* Neutral */}
-        <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-stone-600 uppercase tracking-wider">
-            Sentimiento Neutro
-          </div>
-          <div className="text-2xl font-extrabold text-stone-800 font-['Outfit'] mt-1">17%</div>
-          <div className="text-[10px] text-stone-500 font-medium mt-1">218 opiniones mixtas</div>
-        </div>
-
-        {/* Negative */}
-        <div className="p-4 bg-rose-50/70 border border-rose-200/80 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-rose-800 uppercase tracking-wider">
-            Sentimiento Negativo
-          </div>
-          <div className="text-2xl font-extrabold text-rose-900 font-['Outfit'] mt-1">9%</div>
-          <div className="text-[10px] text-rose-700 font-medium mt-1">116 alertas de fricción</div>
-        </div>
-
-        {/* Top Topic */}
-        <div className="p-4 bg-white border border-stone-200 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-            Tópico Líder
-          </div>
-          <div className="text-sm font-bold text-[#1B4D3E] font-['Outfit'] mt-1 truncate">
-            Sabor y Cremocidad
-          </div>
-          <div className="text-[10px] text-stone-600 mt-1 font-medium">Score Neto: +84 / 100</div>
-        </div>
-
-        {/* Attention */}
-        <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-xl shadow-xs">
-          <div className="text-[11px] font-semibold text-amber-900 uppercase tracking-wider">
-            Requiere Atención
-          </div>
-          <div className="text-sm font-bold text-amber-950 font-['Outfit'] mt-1 truncate">
-            Quiebre de Stock
-          </div>
-          <div className="text-[10px] text-amber-800 mt-1 font-medium">↑ 24.5% menciones</div>
-        </div>
-      </div>
-
-      {/* Executive Narrative Insight Block */}
-      <div className="bg-[#FAF9F5] border border-stone-300/80 rounded-2xl p-5 shadow-xs relative overflow-hidden">
-        <div className="flex items-start gap-3.5">
-          <div className="w-9 h-9 rounded-xl bg-[#1B4D3E] text-emerald-200 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-            <Sparkles className="w-5 h-5 text-[#E6A15C]" />
-          </div>
-          <div className="space-y-1.5 flex-1">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-bold text-stone-900 text-sm font-['Outfit'] tracking-wide">
-                Executive Synthesis · Síntesis Ejecutiva de la Voz del Consumidor
-              </h3>
-              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded">
-                AI-generated insight · prototype
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-              <strong>Producto y sabor</strong> mantienen una percepción unánimemente favorable en todas las provincias (+86 score neto). El lanzamiento de <em>Chocolate Dubai</em> generó un salto del 48% en volumen orgánico sin canibalizar sabores tradicionales. No obstante, se detectan dos tensiones operativas críticas: <strong>tiempos de espera</strong> en sucursales de alta rotación (Posadas Bolívar, Corrientes Junín) y <strong>quiebre de disponibilidad de pistacho</strong> en horarios nocturnos.
+      {/* Low Sample Warning Banner if applicable */}
+      {metrics.isLowSample && (
+        <div className="p-4 bg-amber-50 border border-amber-300/80 rounded-2xl flex items-start gap-3 text-xs text-amber-900 shadow-2xs">
+          <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <strong className="font-bold text-amber-950 block">
+              Muestra Reducida ({metrics.totalAnalyzedConversations} opiniones analizadas)
+            </strong>
+            <p className="text-amber-800 leading-relaxed">
+              El filtro seleccionado posee un tamaño de muestra acotado. Los porcentajes deben interpretarse como tendencias preliminares dentro del contexto público total de {metrics.publicReviewsContextTotal.toLocaleString()} reseñas en Google.
             </p>
           </div>
         </div>
+      )}
+
+      {/* Dynamic Executive Insight Card */}
+      <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-xs relative overflow-hidden space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#1B4D3E] text-white flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-[#E6A15C]" />
+            </div>
+            <h2 className="font-extrabold text-stone-900 text-sm sm:text-base font-['Outfit']">
+              Executive AI Synthesis
+            </h2>
+          </div>
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
+            AI-generated prototype insight
+          </span>
+        </div>
+
+        <p className="text-xs sm:text-sm text-stone-800 font-medium leading-relaxed font-['Plus_Jakarta_Sans']">
+          {metrics.executiveInsight}
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-stone-500">
+          <div className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Driver Principal: <strong>{metrics.topTopic}</strong></span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-rose-500" />
+            <span>Fricción Crítica: <strong>{metrics.topFriction}</strong></span>
+          </div>
+        </div>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Sentiment Trend */}
-        <div className="lg:col-span-7 bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-4">
+      {/* Primary KPI Ribbon (Fully Dynamic) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* 1. Analyzed Corpus */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-xs text-stone-500">
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Corpus Analizado</span>
+            <MessageSquare className="w-4 h-4 text-stone-400" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-['Outfit']">
+            {metrics.totalAnalyzedConversations}
+          </div>
+          <div className="text-[11px] text-stone-500 leading-tight">
+            Denominador activo · <span className="font-semibold text-stone-700">{metrics.publicReviewsContextTotal.toLocaleString()}</span> en Google
+          </div>
+        </div>
+
+        {/* 2. Positive Ratio */}
+        <button
+          onClick={() => handleSentimentClick("positive")}
+          className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-2 text-left hover:border-emerald-400 transition-all group cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs text-stone-500">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-emerald-800">Positivo</span>
+            <ThumbsUp className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-700 font-['Outfit'] flex items-baseline gap-1">
+            <span>{metrics.positivePct}%</span>
+            <span className="text-xs font-normal text-stone-400">favorabilidad</span>
+          </div>
+          <div className="text-[11px] text-emerald-700 font-medium group-hover:underline flex items-center gap-0.5">
+            <span>Ver opiniones positivas</span>
+            <ChevronRight className="w-3 h-3" />
+          </div>
+        </button>
+
+        {/* 3. Negative / Friction */}
+        <button
+          onClick={() => handleSentimentClick("negative")}
+          className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-2 text-left hover:border-rose-400 transition-all group cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs text-stone-500">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-rose-800">Fricción / Negativo</span>
+            <ThumbsDown className="w-4 h-4 text-rose-600 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-rose-700 font-['Outfit'] flex items-baseline gap-1">
+            <span>{metrics.negativePct}%</span>
+            <span className="text-xs font-normal text-stone-400">del corpus</span>
+          </div>
+          <div className="text-[11px] text-rose-700 font-medium group-hover:underline flex items-center gap-0.5">
+            <span>Ver alertas de queja</span>
+            <ChevronRight className="w-3 h-3" />
+          </div>
+        </button>
+
+        {/* 4. Net Sentiment Score */}
+        <div className="bg-[#FAF9F5] border border-stone-200 rounded-2xl p-5 shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-xs text-stone-500">
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Net Sentiment</span>
+            <TrendingUp className="w-4 h-4 text-[#1B4D3E]" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-[#112A23] font-['Outfit']">
+            {metrics.netSentimentScore > 0 ? `+${metrics.netSentimentScore}` : metrics.netSentimentScore}
+          </div>
+          <div className="text-[11px] text-stone-600 leading-tight">
+            Escala -100 a +100 · ({metrics.positivePct}% − {metrics.negativePct}%)
+          </div>
+        </div>
+      </div>
+
+      {/* Main Analytical Section: "Lo que explica estas métricas" (Top 5 Topics) */}
+      <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+          <div>
+            <h3 className="text-base font-bold text-stone-900 font-['Outfit']">
+              Lo que explica estas métricas (Top 5 Drivers Semánticos)
+            </h3>
+            <p className="text-xs text-stone-500">
+              Desglose de los principales tópicos que construyen el sentimiento de la muestra seleccionada.
+            </p>
+          </div>
+          <button
+            onClick={() => onSelectPage("topics")}
+            className="text-xs font-semibold text-[#1B4D3E] hover:underline flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+          >
+            <span>Ver catálogo completo de tópicos</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          {topTopics.map((top, idx) => (
+            <button
+              key={top.topic}
+              onClick={() => handleTopicClick(top.topic)}
+              className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F5]/70 hover:bg-white hover:border-[#1B4D3E] hover:shadow-xs transition-all text-left group cursor-pointer space-y-2"
+            >
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-[10px] font-bold text-stone-400">#0{idx + 1}</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                    top.netScore > 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                  }`}
+                >
+                  {top.netScore > 0 ? `+${top.netScore}` : top.netScore} Net
+                </span>
+              </div>
+
+              <h4 className="font-bold text-stone-900 text-xs line-clamp-2 font-['Outfit'] group-hover:text-[#1B4D3E]">
+                {top.topic}
+              </h4>
+
+              <div className="text-[11px] text-stone-500 flex justify-between pt-1 border-t border-stone-200/60">
+                <span>{top.totalMentions} menciones</span>
+                <span className="font-semibold text-stone-700">{top.category}</span>
+              </div>
+
+              <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden flex">
+                <div
+                  style={{ width: `${top.totalMentions > 0 ? (top.positiveCount / top.totalMentions) * 100 : 70}%` }}
+                  className="bg-emerald-600 h-full"
+                />
+                <div
+                  style={{ width: `${top.totalMentions > 0 ? (top.neutralCount / top.totalMentions) * 100 : 15}%` }}
+                  className="bg-stone-400 h-full"
+                />
+                <div
+                  style={{ width: `${top.totalMentions > 0 ? (top.negativeCount / top.totalMentions) * 100 : 15}%` }}
+                  className="bg-rose-500 h-full"
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Visual Analytics Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Trend Recharts */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
-                Evolución Temporal del Sentimiento
+                Evolución de Volumen Analizado por Mes
               </h3>
-              <p className="text-xs text-stone-500">Tendencia mensual de distribución de opiniones (% del total)</p>
+              <p className="text-xs text-stone-500">Menciones agregadas según el filtro territorial activo.</p>
             </div>
-            <span className="text-[10px] font-medium text-stone-500 bg-stone-100 px-2 py-1 rounded">
-              Semestral
+            <span className="text-[10px] font-semibold bg-stone-100 text-stone-600 px-2 py-0.5 rounded">
+              Semestre Móvil
             </span>
           </div>
 
-          <div className="h-64 w-full text-xs">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} domain={[0, 100]} />
+              <LineChart data={metrics.timeline} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E7E5E4" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#78716C" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#78716C" }} />
                 <Tooltip
-                  formatter={(value: any, name: any) => [`${value}%`, name === "positive" ? "Positivo" : name === "neutral" ? "Neutro" : "Negativo"]}
-                  contentStyle={{ backgroundColor: "#FAF9F5", borderColor: "#e2e8f0", borderRadius: "12px", fontSize: "12px" }}
+                  contentStyle={{
+                    backgroundColor: "#1C1917",
+                    borderRadius: "12px",
+                    border: "none",
+                    color: "#FAF9F5",
+                    fontSize: "12px",
+                  }}
                 />
-                <Legend
-                  formatter={(value) => (value === "positive" ? "Positivo" : value === "neutral" ? "Neutro" : "Negativo")}
-                />
-                <Line type="monotone" dataKey="positive" stroke="#16A34A" strokeWidth={3} dot={{ r: 4 }} name="positive" />
-                <Line type="monotone" dataKey="neutral" stroke="#94A3B8" strokeWidth={2} dot={{ r: 3 }} name="neutral" />
-                <Line type="monotone" dataKey="negative" stroke="#E11D48" strokeWidth={2} dot={{ r: 3 }} name="negative" />
+                <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
+                <Line type="monotone" dataKey="Duomo" stroke="#1B4D3E" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="Grido" stroke="#E6A15C" strokeWidth={2} strokeDasharray="4 4" />
+                <Line type="monotone" dataKey="Cremolatti" stroke="#9333EA" strokeWidth={2} strokeDasharray="2 2" />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Topic Share Bar Chart */}
-        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-4">
+        {/* Channels / Sources Distribution */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-stone-900 text-base font-['Outfit']">
-                Cuota de Conversación por Tópico
+                Distribución por Canal Digital
               </h3>
-              <p className="text-xs text-stone-500">% de menciones totales en el período</p>
+              <p className="text-xs text-stone-500">Composición de la muestra según plataforma de origen.</p>
             </div>
-            <button
-              onClick={() => onSelectPage("topics")}
-              className="text-xs font-semibold text-[#1B4D3E] hover:underline"
-            >
-              Ver todos
-            </button>
+            <Radio className="w-4 h-4 text-stone-400" />
           </div>
 
-          <div className="h-64 w-full text-xs">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={TOPIC_SHARE_DATA}
-                margin={{ top: 5, right: 20, left: 30, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" stroke="#94a3b8" fontSize={11} unit="%" />
-                <YAxis dataKey="name" type="category" stroke="#475569" fontSize={11} width={110} />
-                <Tooltip
-                  formatter={(val: any) => [`${val}% de las menciones`, "Peso"]}
-                  contentStyle={{ backgroundColor: "#FAF9F5", borderColor: "#e2e8f0", borderRadius: "12px", fontSize: "12px" }}
-                />
-                <Bar dataKey="share" fill="#1B4D3E" radius={[0, 6, 6, 0]} barSize={16} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Attention Required / Decision Alerts */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-stone-900 text-base font-['Outfit'] flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-amber-600" /> Señales que Requieren Atención & Monitoreo
-          </h3>
-          <span className="text-xs text-stone-500">Actualizado semanalmente</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1 */}
-          <div className="bg-white border border-stone-200 rounded-xl p-4 shadow-xs space-y-2 hover:border-amber-300 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 uppercase">
-                Stock & Logística
-              </span>
-              <span className="text-xs font-bold text-rose-700 flex items-center">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +24.5%
-              </span>
-            </div>
-            <h4 className="font-bold text-stone-900 text-xs">Aumento en menciones de falta de Pistacho</h4>
-            <p className="text-xs text-stone-600">
-              Concentrado en Corrientes y Chaco a partir de las 20:30 hs. Señal de demanda superior a provisión.
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white border border-stone-200 rounded-xl p-4 shadow-xs space-y-2 hover:border-amber-300 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-900 uppercase">
-                Servicio en Sucursal
-              </span>
-              <span className="text-xs font-bold text-rose-700 flex items-center">
-                <ArrowDownRight className="w-3.5 h-3.5" /> -11%
-              </span>
-            </div>
-            <h4 className="font-bold text-stone-900 text-xs">Caída de favorabilidad en Suc. Av. Uruguay</h4>
-            <p className="text-xs text-stone-600">
-              Comentarios refieren a disparidad de atención y velocidad entre turno mañana y turno noche.
-            </p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-white border border-stone-200 rounded-xl p-4 shadow-xs space-y-2 hover:border-emerald-300 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 uppercase">
-                Lanzamiento
-              </span>
-              <span className="text-xs font-bold text-emerald-700 flex items-center">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +48%
-              </span>
-            </div>
-            <h4 className="font-bold text-stone-900 text-xs">Viralización de Chocolate Dubai</h4>
-            <p className="text-xs text-stone-600">
-              Score neto de 94/100 con alta recurrencia de pedidos de permanencia definitiva en la carta.
-            </p>
-          </div>
-
-          {/* Card 4 */}
-          <div className="bg-white border border-stone-200 rounded-xl p-4 shadow-xs space-y-2 hover:border-blue-300 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 uppercase">
-                Medios de Pago
-              </span>
-              <span className="text-xs font-bold text-stone-700">Fricción</span>
-            </div>
-            <h4 className="font-bold text-stone-900 text-xs">Inestabilidad de QR en horas pico</h4>
-            <p className="text-xs text-stone-600">
-              Resistencia y Eldorado reportan demoras por caídas de conectividad posnet en horario nocturno.
-            </p>
+          <div className="space-y-3 pt-2">
+            {metrics.sourcesBreakdown.map((src) => (
+              <div key={src.name} className="space-y-1.5 p-3 rounded-xl bg-[#FAF9F5] border border-stone-200/80">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-stone-800">{src.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-500">{src.count} opiniones</span>
+                    <span className="font-extrabold text-[#1B4D3E]">{src.pct}%</span>
+                  </div>
+                </div>
+                <div className="h-2 w-full bg-stone-200 rounded-full overflow-hidden">
+                  <div style={{ width: `${src.pct}%` }} className="h-full bg-[#1B4D3E] rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

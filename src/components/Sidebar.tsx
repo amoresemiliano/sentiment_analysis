@@ -53,14 +53,14 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "overview", label: "Overview Ejecutivo", category: "Principal", icon: LayoutDashboard },
   { id: "voice-of-customer", label: "Voice of Customer", category: "Analytics", icon: MessageSquareText },
   { id: "topics", label: "Topic Intelligence", category: "Analytics", icon: Tags },
-  { id: "products", label: "Product Intelligence", category: "Analytics", icon: IceCream },
-  { id: "geography", label: "Geografía (NEA)", category: "Analytics", icon: MapPin },
+  { id: "products", label: "Product & Flavor Intel", category: "Analytics", icon: IceCream },
+  { id: "geography", label: "Geografía (NEA - 90 Sucursales)", category: "Analytics", icon: MapPin },
   { id: "competition", label: "Competencia", category: "Estrategia", icon: Swords, badge: "Key" },
   { id: "promotions", label: "Promociones", category: "Estrategia", icon: BadgePercent },
-  { id: "decision-lab", label: "Decision Lab", category: "Estrategia", icon: FlaskConical, badge: "DSS" },
-  { id: "reviews-explorer", label: "Review Explorer", category: "Datos & Metodología", icon: Search },
-  { id: "ai-methodology", label: "AI Methodology", category: "Datos & Metodología", icon: Cpu },
-  { id: "academic-report", label: "Informe Académico", category: "Datos & Metodología", icon: GraduationCap },
+  { id: "decision-lab", label: "Decision Lab (DSS)", category: "Estrategia", icon: FlaskConical, badge: "DSS" },
+  { id: "reviews-explorer", label: "Explorador de Reviews", category: "Datos & Metodología", icon: Search },
+  { id: "ai-methodology", label: "Metodología IA", category: "Datos & Metodología", icon: Cpu },
+  { id: "academic-report", label: "Informe Académico UdeSA", category: "Datos & Metodología", icon: GraduationCap },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -86,10 +86,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               D
             </div>
             <div className="leading-tight truncate">
-              <span className="font-bold text-sm text-white font-['Outfit'] tracking-wide">
-                DUOMO
+              <span className="font-bold text-sm text-white font-['Outfit'] tracking-wide block">
+                El Sabor de la IA
               </span>
-              <span className="text-[10px] block text-emerald-300 font-medium">Consumer Intelligence</span>
+              <span className="text-[10px] block text-emerald-300 font-medium truncate">
+                by Duomo Helados · 90 sucursales
+              </span>
             </div>
           </div>
         ) : (
@@ -100,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onToggleCollapse}
-          className="p-1 rounded-lg text-emerald-300 hover:text-white hover:bg-emerald-800/50 transition-colors hidden md:flex items-center justify-center"
+          className="p-1 rounded-lg text-emerald-300 hover:text-white hover:bg-emerald-800/50 transition-colors hidden md:flex items-center justify-center cursor-pointer"
           title={isCollapsed ? "Expandir menú" : "Colapsar menú"}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -125,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => onSelectPage(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-all group relative ${
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-all group relative cursor-pointer ${
                       isActive
                         ? "bg-emerald-700/80 text-white font-semibold shadow-xs"
                         : "text-emerald-100/80 hover:bg-emerald-900/40 hover:text-white"
@@ -163,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 border-t border-emerald-900/50 bg-[#0E3027]">
         <button
           onClick={onOpenAboutModal}
-          className="w-full flex items-center gap-2.5 p-2 rounded-xl bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200 hover:text-white transition-colors text-left"
+          className="w-full flex items-center gap-2.5 p-2 rounded-xl bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200 hover:text-white transition-colors text-left cursor-pointer"
         >
           <Info className="w-4 h-4 text-emerald-400 shrink-0" />
           {!isCollapsed && (

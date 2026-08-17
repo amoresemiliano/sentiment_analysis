@@ -1,20 +1,21 @@
 import React, { useState } from "react";
+import { GlobalFilters } from "../types";
 import { NavPage } from "../components/Sidebar";
-import { FilterState, ProductInsight } from "../types";
-import { PROTOTYPE_PRODUCTS } from "../data/prototypeMetrics";
-import { REAL_REVIEWS } from "../data/realReviews";
-import { PROTOTYPE_REVIEWS } from "../data/prototypeMetrics";
+import { computeFlavorInsight, computeDynamicOverviewMetrics, computeEvidenceContextData } from "../data/dynamicAnalyticsEngine";
+import { EvidenceContext } from "../components/EvidenceContext";
 import {
   IceCream,
   Sparkles,
   TrendingUp,
-  AlertTriangle,
-  CheckCircle2,
-  MapPin,
-  ArrowRight,
   ThumbsUp,
   ThumbsDown,
-  ExternalLink,
+  Layers,
+  MapPin,
+  ChevronRight,
+  BarChart3,
+  Award,
+  AlertCircle,
+  Table,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -24,25 +25,47 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Cell,
 } from "recharts";
 
 interface ProductsPageProps {
-  filters: FilterState;
-  onSelectPage: (page: NavPage) => void;
+  filters: GlobalFilters;
+  onSelectPage?: (page: NavPage) => void;
+  onSelectFlavor?: (flavor: string) => void;
+  onDrillDownReview?: (flavor: string, topic?: string) => void;
 }
 
-export const ProductsPage: React.FC<ProductsPageProps> = ({ filters, onSelectPage }) => {
-  const [selectedProductId, setSelectedProductId] = useState<string>("prod-01"); // Default: Chocolate Dubai
+const FLAVORS_CATALOG = [
+  "Chocolate Dubai",
+  "Pistacho",
+  "Dulce de Leche Duomo con nueces",
+  "Sambayón con cerezas",
+  "Chocolate Amargo 70%",
+];
 
-  const selectedProduct =
-    PROTOTYPE_PRODUCTS.find((p) => p.id === selectedProductId) || PROTOTYPE_PRODUCTS[0];
+export const ProductsPage: React.FC<ProductsPageProps> = ({
+  filters,
+  onSelectPage,
+  onSelectFlavor,
+  onDrillDownReview,
+}) => {
+  const currentFlavor = filters.flavor || "Chocolate Dubai";
+  const insight = computeFlavorInsight(currentFlavor, filters);
+  const evidence = computeEvidenceContextData(insight.volumeMentions, filters, currentFlavor);
 
-  // Find reviews that mention this product
-  const allReviews = [...REAL_REVIEWS, ...PROTOTYPE_REVIEWS];
-  const matchingReviews = allReviews.filter((r) =>
-    r.text.toLowerCase().includes(selectedProduct.name.split(" ")[0].toLowerCase()) ||
-    r.topics.some((t) => t.toLowerCase().includes(selectedProduct.name.toLowerCase()))
-  );
+  const handleFlavorChange = (flavor: string) => {
+    if (onSelectFlavor) {
+      onSelectFlavor(flavor);
+    }
+  };
+
+  const handleReviewClick = (topicName?: string) => {
+    if (onDrillDownReview) {
+      onDrillDownReview(currentFlavor, topicName);
+    } else if (onSelectPage) {
+      onSelectPage("reviews-explorer");
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-['Plus_Jakarta_Sans']">
@@ -51,231 +74,200 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ filters, onSelectPag
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-extrabold text-[#112A23] font-['Outfit']">
-              Product & Flavor Intelligence
+              Flavor & Product Intelligence
             </h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-              Evaluación Sensorial y Demanda
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+              Evaluación Sensorial y de Carta
             </span>
           </div>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Análisis profundo de percepción organoléptica, aceptación y fricción por sabor individual.
+            Análisis profundo de la percepción del cliente sobre recetas, lanzamientos, clásicos y fricciones de stock por sabor.
           </p>
         </div>
 
-        <button
-          onClick={() => onSelectPage("decision-lab")}
-          className="px-4 py-2 rounded-xl bg-[#1B4D3E] hover:bg-[#143D32] text-white text-xs font-bold transition-colors shadow-xs flex items-center gap-1.5 self-start md:self-auto"
-        >
-          <span>Evaluar en Decision Lab</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-stone-500">Sabor Activo:</span>
+          <span className="font-bold text-[#1B4D3E] bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg font-['Outfit']">
+            {currentFlavor}
+          </span>
+        </div>
       </div>
 
-      {/* Flavor Selector Carousel */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {PROTOTYPE_PRODUCTS.map((prod) => {
-          const isSelected = prod.id === selectedProductId;
-          return (
-            <button
-              key={prod.id}
-              onClick={() => setSelectedProductId(prod.id)}
-              className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
-                isSelected
-                  ? "bg-[#1B4D3E] text-white border-[#143B30] shadow-sm"
-                  : "bg-white border-stone-200 text-stone-800 hover:border-stone-300 hover:bg-stone-50"
-              }`}
-            >
-              <div className="space-y-1">
-                <span
-                  className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                    isSelected
-                      ? "bg-emerald-800 text-emerald-100"
-                      : "bg-stone-100 text-stone-600"
-                  }`}
-                >
-                  {prod.category}
-                </span>
-                <h4 className="font-bold text-xs leading-snug line-clamp-2 pt-0.5">
-                  {prod.name}
-                </h4>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between text-[11px] pt-2 border-t border-white/10">
-                <span className={isSelected ? "text-emerald-200" : "text-stone-500"}>
-                  {prod.volumeMentions} menciones
-                </span>
-                <span
-                  className={`font-black ${
-                    isSelected ? "text-[#E6A15C]" : "text-emerald-700 font-bold"
-                  }`}
-                >
-                  {prod.sentimentScore}/100
-                </span>
-              </div>
-            </button>
-          );
-        })}
+      {/* Flavor Selection Carousel */}
+      <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-xs space-y-3">
+        <div className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+          Seleccionar Sabor para Diagnóstico:
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+          {FLAVORS_CATALOG.map((flavor) => {
+            const isSelected = currentFlavor === flavor;
+            return (
+              <button
+                key={flavor}
+                onClick={() => handleFlavorChange(flavor)}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-sm font-semibold"
+                    : "bg-[#FAF9F5] text-stone-800 border-stone-200 hover:border-stone-300 hover:bg-white"
+                }`}
+              >
+                <div className="flex items-center justify-between text-[11px] mb-1">
+                  <IceCream className={`w-3.5 h-3.5 ${isSelected ? "text-[#E6A15C]" : "text-stone-400"}`} />
+                  {flavor === "Chocolate Dubai" && (
+                    <span className="text-[9px] font-bold bg-amber-400 text-stone-900 px-1 py-0.2 rounded">
+                      Nuevo
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs font-bold font-['Outfit'] leading-tight">{flavor}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Main Selected Product Dashboard */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-6">
-        {/* Product Top Summary */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-stone-200">
-          <div className="space-y-1 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                {selectedProduct.category}
+      {/* Evidence Context Ribbon */}
+      <EvidenceContext data={evidence} title={`Peso de la Señal para ${currentFlavor}`} />
+
+      {/* Main Flavor Detail Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Flavor Card & KPI */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-5 lg:col-span-1">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase">
+                {insight.category}
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-stone-900 font-['Outfit']">
-                {selectedProduct.name}
-              </h3>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-              {selectedProduct.description}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center min-w-[100px]">
-              <div className="text-[10px] text-emerald-800 font-semibold uppercase">Sentimiento</div>
-              <div className="text-xl font-extrabold text-emerald-900 font-['Outfit']">
-                {selectedProduct.sentimentScore}%
-              </div>
-              <div className="text-[9px] text-emerald-700">Favorabilidad</div>
+              <span className="text-[10px] font-bold text-stone-400">PROTOTYPE DATA</span>
             </div>
 
-            <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl text-center min-w-[100px]">
-              <div className="text-[10px] text-stone-500 font-semibold uppercase">Volumen</div>
-              <div className="text-xl font-extrabold text-stone-900 font-['Outfit']">
-                {selectedProduct.volumeMentions}
-              </div>
-              <div className="text-[9px] text-emerald-700 font-semibold flex items-center justify-center">
-                <TrendingUp className="w-2.5 h-2.5 mr-0.5" /> +{selectedProduct.trend}%
-              </div>
+            <h3 className="text-2xl font-black text-stone-900 font-['Outfit']">{insight.name}</h3>
+            <p className="text-xs text-stone-600 leading-relaxed font-['Plus_Jakarta_Sans']">{insight.description}</p>
+          </div>
+
+          {/* Flavor KPIs */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="p-3 bg-[#FAF9F5] border border-stone-100 rounded-xl">
+              <span className="text-[10px] text-stone-500 font-medium block">Menciones Totales</span>
+              <span className="text-xl font-extrabold text-stone-900 font-['Outfit']">
+                {insight.volumeMentions} opiniones
+              </span>
+              <span className="text-[10px] text-emerald-700 font-semibold block">+{insight.trend}% vs mes ant.</span>
+            </div>
+
+            <div className="p-3 bg-[#FAF9F5] border border-stone-100 rounded-xl">
+              <span className="text-[10px] text-stone-500 font-medium block">Net Sentiment</span>
+              <span className="text-xl font-extrabold text-emerald-700 font-['Outfit']">
+                +{insight.positiveRatio - insight.negativeRatio}
+              </span>
+              <span className="text-[10px] text-stone-500 block">{insight.positiveRatio}% positivo</span>
             </div>
           </div>
+
+          {/* Key Drivers */}
+          <div className="space-y-3 pt-2">
+            <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-950">
+                <ThumbsUp className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Principal Elogio Sensorial</span>
+              </div>
+              <p className="text-xs text-stone-700 leading-snug">{insight.topPositiveAspect}</p>
+            </div>
+
+            <div className="p-3 bg-rose-50/60 border border-rose-200 rounded-xl space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-rose-950">
+                <ThumbsDown className="w-3.5 h-3.5 text-rose-700" />
+                <span>Principal Fricción Operativa</span>
+              </div>
+              <p className="text-xs text-stone-700 leading-snug">{insight.topFriction}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => handleReviewClick()}
+            className="w-full py-2.5 px-3 rounded-xl bg-[#1B4D3E] hover:bg-[#143D32] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+          >
+            <span>Ver reviews de {insight.name}</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* 2-Column: Drivers and Regional breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Positive vs Friction */}
-          <div className="lg:col-span-7 space-y-4">
-            <h4 className="font-bold text-stone-900 text-sm font-['Outfit']">
-              Evaluación de Percepción del Sabor
-            </h4>
-
-            <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-950">
-                <ThumbsUp className="w-4 h-4 text-emerald-700" />
-                <span>Principal Fortaleza Percibida (Positive Driver):</span>
+        {/* Right Column: Topics x Flavor Matrix & Regional Distribution */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Topics x Flavor Matrix */}
+          <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-stone-900 text-base font-['Outfit']">
+                  Matriz de Tópicos Asociados a {insight.name}
+                </h4>
+                <p className="text-xs text-stone-500">¿De qué hablan los consumidores cuando opinan sobre este sabor?</p>
               </div>
-              <p className="text-xs text-stone-700 pl-5 leading-relaxed">
-                {selectedProduct.topPositiveAspect}
-              </p>
+              <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
+                PROTOTYPE ANALYTICS
+              </span>
             </div>
 
-            <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950">
-                <AlertTriangle className="w-4 h-4 text-amber-700" />
-                <span>Principal Punto de Tensión o Fricción:</span>
-              </div>
-              <p className="text-xs text-stone-700 pl-5 leading-relaxed">
-                {selectedProduct.topFriction}
-              </p>
-            </div>
+            <div className="space-y-2.5 pt-1">
+              {insight.topicsMatrix.map((item) => (
+                <div
+                  key={item.topic}
+                  onClick={() => handleReviewClick(item.topic)}
+                  className="p-3 bg-[#FAF9F5] border border-stone-200 rounded-xl hover:border-[#1B4D3E] hover:bg-emerald-50/30 transition-all flex items-center justify-between text-xs cursor-pointer group"
+                >
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-stone-900 group-hover:text-[#1B4D3E]">{item.topic}</span>
+                    <div className="text-[11px] text-stone-500">{item.mentions} menciones en el corpus</div>
+                  </div>
 
-            {/* Sentiment bar breakdown */}
-            <div className="space-y-1.5 pt-2">
-              <div className="flex justify-between text-xs font-semibold text-stone-700">
-                <span>Distribución de Opiniones:</span>
-                <span className="text-stone-500">
-                  {selectedProduct.positiveRatio}% Pos / {selectedProduct.neutralRatio}% Neu / {selectedProduct.negativeRatio}% Neg
-                </span>
-              </div>
-              <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden flex border border-stone-200">
-                <div style={{ width: `${selectedProduct.positiveRatio}%` }} className="bg-emerald-600 h-full" />
-                <div style={{ width: `${selectedProduct.neutralRatio}%` }} className="bg-stone-400 h-full" />
-                <div style={{ width: `${selectedProduct.negativeRatio}%` }} className="bg-rose-500 h-full" />
-              </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`font-black text-xs px-2 py-0.5 rounded ${
+                        item.sentimentScore > 0
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : "bg-rose-100 text-rose-800 border border-rose-200"
+                      }`}
+                    >
+                      {item.sentimentScore > 0 ? `+${item.sentimentScore}` : item.sentimentScore} Net
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-[#1B4D3E]" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Regional Distribution Chart */}
-          <div className="lg:col-span-5 bg-[#FAF9F5] border border-stone-200 rounded-xl p-4 space-y-3">
+          {/* Regional Distribution Chart (Flavor x Region) */}
+          <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-bold text-stone-900 text-xs font-['Outfit'] flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-[#1B4D3E]" /> Distribución Geográfica de Menciones
-              </h4>
-              <span className="text-[10px] text-stone-400 font-medium">NEA</span>
+              <div>
+                <h4 className="font-bold text-stone-900 text-base font-['Outfit']">
+                  Distribución Geográfica de Menciones ({insight.name})
+                </h4>
+                <p className="text-xs text-stone-500">Concentración territorial de interés en las 4 provincias del NEA.</p>
+              </div>
+              <MapPin className="w-4 h-4 text-stone-400" />
             </div>
 
-            <div className="h-44 w-full text-xs">
+            <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={selectedProduct.provincesDistribution}
-                  margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="province" stroke="#64748b" fontSize={10} />
-                  <YAxis stroke="#64748b" fontSize={10} />
+                <BarChart data={insight.provincesDistribution} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E7E5E4" />
+                  <XAxis dataKey="province" tick={{ fontSize: 11, fill: "#78716C" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "#78716C" }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#FAF9F5", borderColor: "#e2e8f0", borderRadius: "10px", fontSize: "11px" }}
+                    contentStyle={{
+                      backgroundColor: "#1C1917",
+                      borderRadius: "12px",
+                      border: "none",
+                      color: "#FAF9F5",
+                      fontSize: "12px",
+                    }}
                   />
-                  <Bar dataKey="mentions" fill="#1B4D3E" radius={[4, 4, 0, 0]} name="Menciones" />
+                  <Bar dataKey="mentions" fill="#1B4D3E" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
-
-        {/* Verbatim Reviews linked to this product */}
-        <div className="space-y-3 pt-4 border-t border-stone-200">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-stone-900 text-sm font-['Outfit']">
-              Evidencia Textual Directa ({matchingReviews.length} opiniones vinculadas)
-            </h4>
-            <span className="text-xs text-stone-500">Muestra observada</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {matchingReviews.slice(0, 4).map((rev) => (
-              <div
-                key={rev.id}
-                className="p-3.5 bg-[#FAF9F5] border border-stone-200 rounded-xl space-y-2 text-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
-                        rev.dataType === "real"
-                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                          : "bg-blue-100 text-blue-800 border border-blue-200"
-                      }`}
-                    >
-                      {rev.dataType === "real" ? "REAL DATA" : "PROTOTYPE"}
-                    </span>
-                    <span className="text-[10px] text-stone-500">{rev.source} · {rev.branch || rev.city}</span>
-                  </div>
-                  <span className="font-bold text-emerald-700">★ {rev.rating || 5}/5</span>
-                </div>
-
-                <p className="text-stone-700 italic font-['Newsreader'] leading-relaxed">
-                  “{rev.text}”
-                </p>
-
-                {rev.sourceUrl && (
-                  <a
-                    href={rev.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[10px] text-[#1B4D3E] font-semibold hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>Ver fuente original</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                )}
-              </div>
-            ))}
           </div>
         </div>
       </div>
