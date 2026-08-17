@@ -1,0 +1,6 @@
+{
+  "name": "Duomo Consumer Intelligence",
+  "description": "Plataforma de AI Consumer Intelligence y Decision Support System para Helados Duomo vs Grido y Cremolatti en el NEA argentino.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
