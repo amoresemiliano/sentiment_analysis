@@ -3,12 +3,35 @@ export type SentimentLabel = "positive" | "neutral" | "negative";
 export type DataType = "real" | "prototype" | "real-pilot" | "unverified-seed";
 export type Source = "Google" | "Instagram" | "Facebook" | "TikTok" | "YouTube" | "Tripadvisor" | "Todas";
 export type Province = "Misiones" | "Corrientes" | "Chaco" | "Formosa" | "Todas";
+export type TimeSlot = "Morning" | "Afternoon" | "Night" | "Unknown";
+export type DayOfWeek = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday" | "Lunes" | "Martes" | "Miércoles" | "Jueves" | "Viernes" | "Sábado" | "Domingo";
 
 export interface AspectSentiment {
   name: string;
   sentiment: SentimentLabel;
   confidence: number;
   snippet?: string;
+}
+
+export interface ReviewContext {
+  weather?: {
+    temperature?: number;
+    maxTemperature?: number;
+    condition?: string;
+    precipitation?: number;
+    humidity?: number;
+    dataSource?: string;
+  } | null;
+  calendar?: {
+    isWeekend: boolean;
+    isHoliday?: boolean;
+    season?: string;
+  };
+  business?: {
+    promotion?: string;
+    launch?: string;
+    event?: string;
+  };
 }
 
 export interface Review {
@@ -22,6 +45,11 @@ export interface Review {
   country: "Argentina";
   source: Source;
   date: string;
+  dayOfWeek?: string;
+  isWeekend?: boolean;
+  timeOfDay?: string;
+  timeSlot?: TimeSlot;
+  contextData?: ReviewContext | null;
   rating?: number;
   text: string;
   author?: string;
@@ -57,6 +85,50 @@ export interface RealPilotReview {
   sentimentScore?: number;
   topics?: string[];
   flavorMentioned?: string;
+  dayOfWeek?: string;
+  isWeekend?: boolean;
+  timeSlot?: TimeSlot;
+  contextData?: ReviewContext | null;
+}
+
+export interface BusinessInsight {
+  id: string;
+  type:
+    | "branch"
+    | "operations"
+    | "product"
+    | "time"
+    | "context"
+    | "marketing"
+    | "competitive";
+  title: string;
+  observation: string;
+  interpretation: string;
+  businessQuestion: string;
+  evidence: {
+    mentions: number;
+    analyzedCorpus: number;
+    prevalence: number;
+    reviewIds: string[];
+  };
+  dimensions: {
+    brand?: string;
+    province?: string;
+    city?: string;
+    branch?: string;
+    flavor?: string;
+    topic?: string;
+    sentiment?: string;
+    source?: string;
+    timeSlot?: string;
+    isWeekend?: boolean;
+  };
+  evidenceLevel: "limited" | "emerging" | "recurrent";
+  methodologyNote?: string;
+  dataType: "real-pilot" | "prototype" | "mixed";
+  isSmallSample?: boolean;
+  sourcesDistribution?: { name: string; count: number; pct: number }[];
+  contextData?: ReviewContext | null;
 }
 
 export interface GlobalFilters {
@@ -70,6 +142,11 @@ export interface GlobalFilters {
   source: string | null;     // "Google" | "Instagram" | "Facebook" | "TikTok" | null
   period: string | null;     // "Últimos 90 días" | "Últimos 30 días" | "Año Móvil" | null
   searchQuery: string;
+  timeSlot?: TimeSlot | "Todos" | null;
+  dayOfWeek?: string | null;
+  isWeekend?: boolean | null;
+  insightId?: string | null;
+  targetReviewIds?: string[] | null;
   dataMode?: "all" | "prototype" | "real-pilot" | "unverified-seed" | null;
   dataTypeFilter?: "Todas" | "real-pilot" | "prototype" | "unverified-seed" | null;
 }

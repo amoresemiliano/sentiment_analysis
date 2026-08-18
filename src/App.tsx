@@ -24,6 +24,8 @@ import { DecisionLabPage } from "./pages/DecisionLabPage";
 import { ReviewsExplorerPage } from "./pages/ReviewsExplorerPage";
 import { AiMethodologyPage } from "./pages/AiMethodologyPage";
 import { AcademicReportPage } from "./pages/AcademicReportPage";
+import { InsightsPage } from "./pages/InsightsPage";
+import { BusinessInsight } from "./types";
 
 const INITIAL_FILTERS: GlobalFilters = {
   period: "Últimos 90 días",
@@ -131,6 +133,16 @@ export default function App() {
     }));
   };
 
+  const handleNavigateToReviewsWithInsight = (insight: BusinessInsight) => {
+    setFilters((prev) => ({
+      ...prev,
+      targetReviewIds: insight.evidence.reviewIds,
+      insightId: insight.id,
+      searchQuery: "",
+    }));
+    handleSelectPage("reviews-explorer");
+  };
+
   // Compute number of matching reviews
   const filteredReviewsCount = getFilteredReviews(filters).length;
 
@@ -194,6 +206,14 @@ export default function App() {
               onSelectPage={handleSelectPage}
               onDrillDownSentiment={handleDrillDownSentiment}
               onDrillDownTopic={handleDrillDownTopic}
+            />
+          )}
+
+          {currentPage === "insights" && (
+            <InsightsPage
+              filters={filters}
+              onUpdateFilters={(newF) => setFilters((prev) => ({ ...prev, ...newF }))}
+              onNavigateToReviewsWithFilter={handleNavigateToReviewsWithInsight}
             />
           )}
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GlobalFilters, Review, SentimentLabel } from "../types";
 import { getFilteredReviews } from "../data/dynamicAnalyticsEngine";
+import { CANONICAL_BUSINESS_INSIGHTS } from "../data/businessInsights";
 import {
   Search,
   Star,
@@ -18,6 +19,12 @@ import {
   Share2,
   ChevronDown,
   ChevronUp,
+  Clock,
+  Sun,
+  Sunset,
+  Moon,
+  Lightbulb,
+  X,
 } from "lucide-react";
 
 interface ReviewsExplorerPageProps {
@@ -34,6 +41,10 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
     filters.sentiment || "Todos"
   );
   const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
+
+  const activeInsight = filters.insightId
+    ? CANONICAL_BUSINESS_INSIGHTS.find((ins) => ins.id === filters.insightId)
+    : null;
 
   const activeFilteredReviews = getFilteredReviews({
     ...filters,
@@ -57,6 +68,14 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
     });
   };
 
+  const handleClearInsightDrillDown = () => {
+    onFilterChange({
+      ...filters,
+      targetReviewIds: null,
+      insightId: null,
+    });
+  };
+
   const toggleExpand = (id: string) => {
     setExpandedReviews((prev) => ({
       ...prev,
@@ -64,8 +83,76 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
     }));
   };
 
+  const getTimeSlotBadge = (review: Review) => {
+    const slot = review.timeSlot;
+    if (!slot || slot === "Unknown") return null;
+
+    if (slot === "Night") {
+      return (
+        <span className="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-200 text-indigo-900 px-2 py-0.5 rounded text-[10px] font-semibold">
+          <Moon className="w-3 h-3 text-indigo-600 shrink-0" />
+          <span>Turno Noche</span>
+        </span>
+      );
+    }
+    if (slot === "Afternoon") {
+      return (
+        <span className="inline-flex items-center gap-1 bg-orange-50 border border-orange-200 text-orange-900 px-2 py-0.5 rounded text-[10px] font-semibold">
+          <Sunset className="w-3 h-3 text-orange-600 shrink-0" />
+          <span>Turno Tarde</span>
+        </span>
+      );
+    }
+    if (slot === "Morning") {
+      return (
+        <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-900 px-2 py-0.5 rounded text-[10px] font-semibold">
+          <Sun className="w-3 h-3 text-amber-600 shrink-0" />
+          <span>Turno Mañana</span>
+        </span>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-['Plus_Jakarta_Sans']">
+      {/* Active Insight Drill-down Banner */}
+      {filters.targetReviewIds && filters.targetReviewIds.length > 0 && (
+        <div className="bg-emerald-950 text-white rounded-2xl p-4 sm:p-5 shadow-lg border border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-800/80 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+              <Lightbulb className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">
+                  Filtrado por Business Insight
+                </span>
+                {filters.insightId && (
+                  <span className="text-[10px] font-mono text-emerald-300">
+                    ID: {filters.insightId}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-white font-['Outfit'] mt-0.5">
+                {activeInsight ? activeInsight.title : "Evidencia vinculada al Insight seleccionado"}
+              </h3>
+              <p className="text-xs text-emerald-200/90 mt-0.5">
+                Mostrando {activeFilteredReviews.length} opiniones verbatims que sustentan cuantitativa y cualitativamente esta señal.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleClearInsightDrillDown}
+            className="min-h-[44px] px-4 py-2 bg-white text-emerald-950 hover:bg-emerald-100 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 self-stretch sm:self-auto"
+          >
+            <X className="w-4 h-4" />
+            <span>Quitar filtro de Insight</span>
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border border-stone-200 p-4 sm:p-6 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -155,6 +242,7 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
             const isLong = review.text.length > 180;
             const isExpanded = !!expandedReviews[review.id];
             const isReal = review.isRealPilot || (review as any).datasetType === "real_pilot" || (review as any).source === "Google Maps";
+            const timeSlotBadge = getTimeSlotBadge(review);
 
             return (
               <div
@@ -177,6 +265,12 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
                       <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-0.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                         <span>Piloto Real</span>
+                      </span>
+                    )}
+                    {timeSlotBadge}
+                    {review.isWeekend && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">
+                        Fin de semana
                       </span>
                     )}
                   </div>
@@ -269,6 +363,7 @@ export const ReviewsExplorerPage: React.FC<ReviewsExplorerPageProps> = ({
                   <div className="flex items-center gap-2 text-[10px] text-stone-400">
                     <Calendar className="w-3 h-3 shrink-0" />
                     <span>{review.date}</span>
+                    {review.dayOfWeek && <span>({review.dayOfWeek})</span>}
                     <span>·</span>
                     <span className="font-semibold text-stone-500">Verificado</span>
                   </div>

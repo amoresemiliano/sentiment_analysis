@@ -16,11 +16,13 @@ import {
   ChevronRight,
   Home,
   Info,
+  Lightbulb,
 } from "lucide-react";
 
 export type NavPage =
   | "home"
   | "overview"
+  | "insights"
   | "voice-of-customer"
   | "topics"
   | "products"
@@ -51,6 +53,7 @@ interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Inicio / Visión", category: "Principal", icon: Home },
   { id: "overview", label: "Overview Ejecutivo", category: "Principal", icon: LayoutDashboard },
+  { id: "insights", label: "Business Insights", category: "Principal", icon: Lightbulb, badge: "New" },
   { id: "voice-of-customer", label: "Voice of Customer", category: "Analytics", icon: MessageSquareText },
   { id: "topics", label: "Topic Intelligence", category: "Analytics", icon: Tags },
   { id: "products", label: "Product & Flavor Intel", category: "Analytics", icon: IceCream },

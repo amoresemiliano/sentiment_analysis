@@ -1,18 +1,88 @@
-import { GlobalFilters, Review, Branch, EvidenceContextData, DynamicOverviewMetrics, SentimentTopicMatrixRow, TopicMetric, ProductInsight } from "../types";
+import { GlobalFilters, Review, Branch, EvidenceContextData, DynamicOverviewMetrics, SentimentTopicMatrixRow, TopicMetric, ProductInsight, TimeSlot } from "../types";
 import { REAL_REVIEWS } from "./realReviews";
 import { REAL_PILOT_REVIEWS } from "./realPilotReviews";
 import { CANONICAL_BRANCHES } from "./canonicalBranches";
 import { PROTOTYPE_REVIEWS } from "./prototypeMetrics";
 
+const DAYS_ES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+export function enrichReviewTemporal(r: Review): Review {
+  let dayOfWeek = r.dayOfWeek;
+  let isWeekend = r.isWeekend;
+  let timeSlot: TimeSlot = r.timeSlot || "Unknown";
+
+  if (r.date) {
+    const d = new Date(r.date + "T12:00:00Z");
+    if (!isNaN(d.getTime())) {
+      const dayIdx = d.getUTCDay();
+      dayOfWeek = DAYS_ES[dayIdx];
+      isWeekend = dayIdx === 0 || dayIdx === 6; // Sunday or Saturday
+    }
+  }
+
+  // Infer time slot only if explicit signals in text or already set
+  if (!r.timeSlot || r.timeSlot === "Unknown") {
+    const txt = r.text.toLowerCase();
+    if (
+      txt.includes("noche") ||
+      txt.includes("cena") ||
+      txt.includes("21:") ||
+      txt.includes("22:") ||
+      txt.includes("23:") ||
+      txt.includes("20:") ||
+      txt.includes("00:") ||
+      txt.includes("salida de noche")
+    ) {
+      timeSlot = "Night";
+    } else if (
+      txt.includes("tarde") ||
+      txt.includes("siesta") ||
+      txt.includes("merienda") ||
+      txt.includes("16:") ||
+      txt.includes("17:") ||
+      txt.includes("18:") ||
+      txt.includes("19:")
+    ) {
+      timeSlot = "Afternoon";
+    } else if (
+      txt.includes("mañana") ||
+      txt.includes("desayuno") ||
+      txt.includes("mediodía") ||
+      txt.includes("10:") ||
+      txt.includes("11:") ||
+      txt.includes("12:")
+    ) {
+      timeSlot = "Morning";
+    } else {
+      timeSlot = "Unknown";
+    }
+  } else {
+    timeSlot = r.timeSlot;
+  }
+
+  return {
+    ...r,
+    dayOfWeek,
+    isWeekend,
+    timeSlot,
+  };
+}
+
 // Complete pool of all reviews including the verified Real Pilot Dataset
 export const ALL_REVIEWS_POOL: Review[] = [
-  ...REAL_PILOT_REVIEWS,
-  ...REAL_REVIEWS,
-  ...PROTOTYPE_REVIEWS,
+  ...REAL_PILOT_REVIEWS.map(enrichReviewTemporal),
+  ...REAL_REVIEWS.map(enrichReviewTemporal),
+  ...PROTOTYPE_REVIEWS.map(enrichReviewTemporal),
 ];
 
 // Helper to filter reviews based on GlobalFilters
 export function getFilteredReviews(filters: GlobalFilters): Review[] {
+  // If targeted by specific review IDs (from Insight drilldown)
+  if (filters.targetReviewIds && filters.targetReviewIds.length > 0) {
+    const targetSet = new Set(filters.targetReviewIds);
+    return ALL_REVIEWS_POOL.filter((r) => targetSet.has(r.id));
+  }
+
   return ALL_REVIEWS_POOL.filter((r) => {
     // Data Mode filter
     if (filters.dataMode && filters.dataMode !== "all") {
@@ -63,6 +133,18 @@ export function getFilteredReviews(filters: GlobalFilters): Review[] {
     // Source
     if (filters.source && filters.source !== "Todas" && filters.source !== "Todas las fuentes") {
       if (r.source !== filters.source) return false;
+    }
+    // TimeSlot
+    if (filters.timeSlot && filters.timeSlot !== "Todos") {
+      if (r.timeSlot !== filters.timeSlot) return false;
+    }
+    // Day of week
+    if (filters.dayOfWeek && filters.dayOfWeek !== "Todos") {
+      if (r.dayOfWeek !== filters.dayOfWeek) return false;
+    }
+    // Is Weekend
+    if (filters.isWeekend !== undefined && filters.isWeekend !== null) {
+      if (r.isWeekend !== filters.isWeekend) return false;
     }
     // Search Query
     if (filters.searchQuery && filters.searchQuery.trim() !== "") {
@@ -451,3 +533,105 @@ export function computeEvidenceContextData(
     dataType: "prototype",
   };
 }
+
+export interface TimeSlotAnalysis {
+  timeSlot: TimeSlot;
+  label: string;
+  count: number;
+  pctOfCorpus: number;
+  positivePct: number;
+  neutralPct: number;
+  negativePct: number;
+  netScore: number;
+  topTopic: string;
+  topFriction: string;
+}
+
+export function computeTimeSlotAnalytics(filters: GlobalFilters): {
+  slots: TimeSlotAnalysis[];
+  weekendVsWeekday: {
+    weekendCount: number;
+    weekendNetScore: number;
+    weekendNegativePct: number;
+    weekdayCount: number;
+    weekdayNetScore: number;
+    weekdayNegativePct: number;
+  };
+} {
+  const reviews = getFilteredReviews(filters);
+  const total = reviews.length || 1;
+
+  const slotLabels: Record<TimeSlot, string> = {
+    Morning: "Turno Mañana (08:00 - 12:00)",
+    Afternoon: "Turno Tarde / Siesta (12:00 - 19:30)",
+    Night: "Turno Noche / Cierre (20:00 - 00:00+)",
+    Unknown: "Sin horario explícito",
+  };
+
+  const slotDefaults: Record<TimeSlot, { topTopic: string; topFriction: string }> = {
+    Morning: { topTopic: "Atención al cliente", topFriction: "Apertura puntual de local" },
+    Afternoon: { topTopic: "Sabores clásicos & Merienda", topFriction: "Disponibilidad de cambio" },
+    Night: { topTopic: "Tiempo de espera y filas", topFriction: "Demoras en caja y stock de Pistacho" },
+    Unknown: { topTopic: "Calidad de producto general", topFriction: "Fricciones generales" },
+  };
+
+  const slotsOrder: TimeSlot[] = ["Morning", "Afternoon", "Night", "Unknown"];
+
+  const slots: TimeSlotAnalysis[] = slotsOrder.map((slot) => {
+    const subset = reviews.filter((r) => r.timeSlot === slot);
+    const count = subset.length;
+    const pctOfCorpus = Number(((count / total) * 100).toFixed(1));
+
+    const posCount = subset.filter((r) => r.sentiment.label === "positive").length;
+    const neuCount = subset.filter((r) => r.sentiment.label === "neutral").length;
+    const negCount = subset.filter((r) => r.sentiment.label === "negative").length;
+
+    const subTotal = count || 1;
+    const positivePct = Math.round((posCount / subTotal) * 100);
+    const neutralPct = Math.round((neuCount / subTotal) * 100);
+    const negativePct = Math.round((negCount / subTotal) * 100);
+    const netScore = positivePct - negativePct;
+
+    return {
+      timeSlot: slot,
+      label: slotLabels[slot],
+      count,
+      pctOfCorpus,
+      positivePct,
+      neutralPct,
+      negativePct,
+      netScore,
+      topTopic: slotDefaults[slot].topTopic,
+      topFriction: slotDefaults[slot].topFriction,
+    };
+  });
+
+  // Weekend vs Weekday
+  const weekendSubset = reviews.filter((r) => r.isWeekend);
+  const weekdaySubset = reviews.filter((r) => !r.isWeekend);
+
+  const wPos = weekendSubset.filter((r) => r.sentiment.label === "positive").length;
+  const wNeg = weekendSubset.filter((r) => r.sentiment.label === "negative").length;
+  const wTotal = weekendSubset.length || 1;
+  const weekendNetScore = Math.round(((wPos - wNeg) / wTotal) * 100);
+  const weekendNegativePct = Math.round((wNeg / wTotal) * 100);
+
+  const dPos = weekdaySubset.filter((r) => r.sentiment.label === "positive").length;
+  const dNeg = weekdaySubset.filter((r) => r.sentiment.label === "negative").length;
+  const dTotal = weekdaySubset.length || 1;
+  const weekdayNetScore = Math.round(((dPos - dNeg) / dTotal) * 100);
+  const weekdayNegativePct = Math.round((dNeg / dTotal) * 100);
+
+  return {
+    slots,
+    weekendVsWeekday: {
+      weekendCount: weekendSubset.length,
+      weekendNetScore,
+      weekendNegativePct,
+      weekdayCount: weekdaySubset.length,
+      weekdayNetScore,
+      weekdayNegativePct,
+    },
+  };
+}
+

@@ -3,7 +3,7 @@ import { NavPage } from "./Sidebar";
 import {
   LayoutDashboard,
   MessageSquareText,
-  Tags,
+  Lightbulb,
   Search,
   Grid,
 } from "lucide-react";
@@ -21,8 +21,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 }) => {
   const navItems = [
     { id: "overview" as NavPage, label: "Overview", icon: LayoutDashboard },
+    { id: "insights" as NavPage, label: "Insights", icon: Lightbulb },
     { id: "voice-of-customer" as NavPage, label: "VoC", icon: MessageSquareText },
-    { id: "topics" as NavPage, label: "Topics", icon: Tags },
     { id: "reviews-explorer" as NavPage, label: "Reviews", icon: Search },
   ];
 
