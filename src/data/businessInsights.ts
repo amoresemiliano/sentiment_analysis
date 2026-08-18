@@ -1,47 +1,74 @@
 import { BusinessInsight, GlobalFilters, Review, TimeSlot } from "../types";
+import {
+  deriveInsightDataType,
+  deriveManagementAttention,
+  deriveSignalStrength,
+  validateBusinessInsight,
+} from "../utils/methodologicalValidation";
 
 /**
- * REPOSITORIO CANÓNICO DE BUSINESS INSIGHTS
+ * REPOSITORIO CANÓNICO DE BUSINESS INSIGHTS CON AUDITORÍA METODOLÓGICA (ITERACIÓN 5.1)
  * 
- * Basado en el principio de trazabilidad:
- * Cada Insight explica WHAT, WHERE, WHEN, WHY IT MATTERS, HOW MUCH EVIDENCE y WHICH REVIEWS SUPPORT IT.
+ * Principios Epistemológicos:
+ * 1. Hecho Observado (Observed Data): Recuento exacto de menciones y verbatims.
+ * 2. Patrón Descriptivo (Pattern): Concentración o recurrencia observacional en el corpus.
+ * 3. Hipótesis Explicativa (Exploratory Hypothesis): Línea interpretativa a investigar (no afirmación causal).
+ * 4. Validación Requerida (Validation Required): Preguntas y contrastaciones operativas necesarias.
  * 
- * Niveles de evidencia:
- * - Evidencia limitada: Pocos registros o baja prevalencia (<5%).
- * - Señal emergente: Patrón que comienza a repetirse (5% - 15%).
- * - Patrón recurrente: Concentración clara dentro del corpus (>15%).
- * 
- * Lenguaje: No dogmático ("se observa", "la muestra sugiere", "podría estar relacionado").
+ * Reglas de Linaje y Matemáticas:
+ * - `mentions`: estrictamente igual a `uniqueReviewIds.length`.
+ * - `prevalence`: derivado de `(mentions / analyzedCorpus) * 100` con 1 decimal.
+ * - `dataType`: derivado de las evidencias reales (nunca verified-public si contiene pilot o proto).
+ * - `signalStrength`: graduación observacional transparente sin términos estadísticos opacos.
+ * - `managementAttention`: Watch / Attention / High Attention con badge no causal.
  */
-export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
+
+interface RawBusinessInsightDefinition {
+  id: string;
+  type: BusinessInsight["type"];
+  title: string;
+  observedData: string;
+  pattern: string;
+  exploratoryHypothesis: string;
+  validationRequired: string;
+  reviewIds: string[];
+  analyzedCorpus: number;
+  corpusDescription: string;
+  dimensions: BusinessInsight["dimensions"];
+  methodologyNote?: string;
+  nonCausalDisclaimer?: string;
+  isSmallSample?: boolean;
+  sourcesDistribution?: { name: string; count: number; pct: number }[];
+  contextData?: BusinessInsight["contextData"];
+}
+
+const RAW_INSIGHT_DEFINITIONS: RawBusinessInsightDefinition[] = [
   {
     id: "insight-ops-01",
     type: "operations",
     title: "Concentración de demoras y fricción en turno nocturno durante fines de semana",
-    observation: "Se observa una concentración de 14 menciones negativas referidas a tiempos de espera prolongados (>20-35 minutos) y filas que desbordan el local, concentradas entre las 20:30 y 23:30 hs de viernes a domingos en sucursales de alta densidad peatonal.",
-    interpretation: "La señal podría reflejar una saturación puntual de la capacidad operativa en caja y despacho durante picos de afluencia de fin de semana, generando una brecha perceptible frente al estándar habitual de atención rápida.",
-    businessQuestion: "¿La dotación operativa, cantidad de puntos de cobro y distribución de tareas en mostrador son suficientes para absorber los picos de demanda nocturna de viernes a domingo?",
-    evidence: {
-      mentions: 14,
-      analyzedCorpus: 104,
-      prevalence: 13.5,
-      reviewIds: [
-        "pilot-duomo-pos-bol-04",
-        "pilot-duomo-pos-uru-02",
-        "pilot-duomo-pos-cos-03",
-        "pilot-duomo-for-cen-04",
-        "pilot-duomo-ctes-jun-03",
-        "pilot-duomo-res-pea-02",
-        "pilot-duomo-pos-qua-03",
-        "real-duomo-02",
-        "real-duomo-07",
-        "real-duomo-12",
-        "proto-duomo-05",
-        "proto-duomo-18",
-        "proto-duomo-29",
-        "proto-duomo-42",
-      ],
-    },
+    observedData: "14 menciones registradas se concentran en demoras de despacho (>20-35 minutos) y filas en el local entre las 20:30 y 23:30 hs de viernes a domingos en sucursales de alta concurrencia.",
+    pattern: "Existe una concentración recurrente de fricción por tiempos de espera durante los picos nocturnos de fin de semana dentro del corpus observado.",
+    exploratoryHypothesis: "Una hipótesis exploratoria a investigar es que la demanda en mostrador supere la capacidad operativa instalada de cobro y despacho en esos horarios pico.",
+    validationRequired: "Contrastar con curvas horarias de tickets emitidos, dotación efectiva por turno y tiempos de transacción en caja.",
+    reviewIds: [
+      "pilot-duomo-pos-bol-04",
+      "pilot-duomo-pos-uru-02",
+      "pilot-duomo-pos-cos-03",
+      "pilot-duomo-for-cen-04",
+      "pilot-duomo-ctes-jun-03",
+      "pilot-duomo-res-pea-02",
+      "pilot-duomo-pos-qua-03",
+      "real-duomo-02",
+      "real-duomo-07",
+      "real-duomo-12",
+      "proto-duomo-05",
+      "proto-duomo-18",
+      "proto-duomo-29",
+      "proto-duomo-42",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "14 menciones sobre 104 textos de sucursales Duomo analizados (13.5% del corpus seleccionado)",
     dimensions: {
       brand: "Duomo",
       topic: "Tiempo de espera y filas",
@@ -49,9 +76,8 @@ export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
       timeSlot: "Night",
       isWeekend: true,
     },
-    evidenceLevel: "emerging",
-    methodologyNote: "Identificado por coincidencia semántica de términos de espera + mención temporal de noche/fin de semana en el corpus del piloto real y validación cruzada.",
-    dataType: "real-pilot",
+    methodologyNote: "Detección semántica de demoras + filtro temporal de fin de semana noche sobre el corpus estructurado.",
+    nonCausalDisclaimer: "Asociación exploratoria · no identifica por sí sola la causa del fenómeno",
     sourcesDistribution: [
       { name: "Google Maps", count: 11, pct: 78.6 },
       { name: "Instagram", count: 2, pct: 14.3 },
@@ -62,186 +88,170 @@ export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
     id: "insight-prod-01",
     type: "product",
     title: "Chocolate Dubai: Alta favorabilidad organoléptica con tensión de disponibilidad y stock",
-    observation: "El sabor Chocolate Dubai registra un 88.4% de favorabilidad en sabor y textura (crocante de pistacho con masa kataifi), pero un 23.8% de las opiniones que lo nombran reportan quiebre de stock en el turno tarde/noche.",
-    interpretation: "La insatisfacción detectada se concentra predominantemente en el acceso y reposición del producto en mostrador, y no en una desaprobación organoléptica de la receta o su precio relativo.",
-    businessQuestion: "¿Conviene ajustar la frecuencia de entrega desde planta logística y el stock de seguridad en sucursales clave antes de evaluar la continuidad o permanencia del sabor?",
-    evidence: {
-      mentions: 19,
-      analyzedCorpus: 104,
-      prevalence: 18.3,
-      reviewIds: [
-        "pilot-duomo-pos-bol-02",
-        "pilot-duomo-pos-uru-04",
-        "pilot-duomo-pos-san-02",
-        "pilot-duomo-pos-ita-03",
-        "pilot-duomo-obe-lib-02",
-        "pilot-duomo-ctes-jun-02",
-        "pilot-duomo-res-pea-03",
-        "pilot-duomo-for-cen-02",
-        "real-duomo-03",
-        "real-duomo-09",
-        "proto-duomo-01",
-        "proto-duomo-11",
-        "proto-duomo-22",
-        "proto-duomo-33",
-        "proto-duomo-45",
-      ],
-    },
+    observedData: "15 menciones registradas sobre Chocolate Dubai expresan una valoración favorable sobre sabor y textura kataifi, mientras 4 opiniones reportan quiebre de stock en mostrador en turno tarde/noche.",
+    pattern: "El producto presenta una recepción favorable consistente junto a una señal recurrente de fricción vinculada a disponibilidad en mostrador.",
+    exploratoryHypothesis: "La demanda del sabor podría estar superando los lotes de reposición asignados a las sucursales de mayor rotación.",
+    validationRequired: "Revisar rotación de tachos por sucursal, frecuencia de despacho desde planta y reclamos de mostrador.",
+    reviewIds: [
+      "pilot-duomo-pos-bol-02",
+      "pilot-duomo-pos-uru-04",
+      "pilot-duomo-pos-san-02",
+      "pilot-duomo-pos-ita-03",
+      "pilot-duomo-obe-lib-02",
+      "pilot-duomo-ctes-jun-02",
+      "pilot-duomo-res-pea-03",
+      "pilot-duomo-for-cen-02",
+      "real-duomo-03",
+      "real-duomo-09",
+      "proto-duomo-01",
+      "proto-duomo-11",
+      "proto-duomo-22",
+      "proto-duomo-33",
+      "proto-duomo-45",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "15 menciones sobre 104 textos analizados (14.4% del corpus)",
     dimensions: {
       brand: "Duomo",
       flavor: "Chocolate Dubai",
       topic: "Disponibilidad y stock",
     },
-    evidenceLevel: "recurrent",
-    methodologyNote: "Descomposición ABSA (Aspect-Based Sentiment Analysis) aislando aspectos de sabor vs disponibilidad sobre 19 menciones específicas de Chocolate Dubai.",
-    dataType: "real-pilot",
+    methodologyNote: "Descomposición ABSA aislando aspectos de sabor vs disponibilidad en menciones de Chocolate Dubai.",
+    nonCausalDisclaimer: "Asociación exploratoria · no implica causalidad",
     sourcesDistribution: [
-      { name: "Google Maps", count: 14, pct: 73.7 },
-      { name: "Instagram", count: 4, pct: 21.1 },
-      { name: "Facebook", count: 1, pct: 5.2 },
+      { name: "Google Maps", count: 11, pct: 73.3 },
+      { name: "Instagram", count: 3, pct: 20.0 },
+      { name: "Facebook", count: 1, pct: 6.7 },
     ],
   },
   {
     id: "insight-branch-01",
     type: "branch",
-    title: "Remodelación de salones y climatización como motor directo de lealtad y valor de visita",
-    observation: "Las menciones espontáneas sobre remodelación física, estética moderna, accesibilidad con rampas y aire acondicionado potente representan el 21.2% de los comentarios altamente positivos en Misiones, Formosa y Corrientes.",
-    interpretation: "En una región con clima subtropical y veranos de alta exigencia térmica, la calidad ambiental del local actúa como un factor diferenciador clave que justifica la visita física y eleva la percepción de calidad general.",
-    businessQuestion: "¿Qué correlación existe entre las sucursales con salones remodelados y el volumen de consumo en salón frente a aquellas con diseño anterior?",
-    evidence: {
-      mentions: 22,
-      analyzedCorpus: 104,
-      prevalence: 21.2,
-      reviewIds: [
-        "pilot-duomo-pos-bol-01",
-        "pilot-duomo-pos-cos-01",
-        "pilot-duomo-pos-uru-01",
-        "pilot-duomo-pos-san-01",
-        "pilot-duomo-pos-tam-01",
-        "pilot-duomo-obe-sar-01",
-        "pilot-duomo-eld-san-01",
-        "pilot-duomo-ctes-jun-01",
-        "pilot-duomo-ctes-3ab-01",
-        "pilot-duomo-for-cen-01",
-        "pilot-duomo-for-25m-01",
-        "real-duomo-01",
-        "real-duomo-08",
-        "real-duomo-14",
-      ],
-    },
+    title: "Remodelación de salones y climatización como factor positivo de experiencia",
+    observedData: "14 menciones espontáneas destacan la renovación estética, comodidad, accesibilidad con rampas y aire acondicionado en salones inaugurados o remodelados.",
+    pattern: "Se observa una asociación constante entre la modernización de infraestructura y comentarios de alta satisfacción ambiental.",
+    exploratoryHypothesis: "En el contexto térmico del NEA, la calidad del espacio físico actúa como un factor diferenciador que fomenta la visita y permanencia.",
+    validationRequired: "Contrastar ticket promedio y consumo en salón en sucursales remodeladas vs formato tradicional.",
+    reviewIds: [
+      "pilot-duomo-pos-bol-01",
+      "pilot-duomo-pos-cos-01",
+      "pilot-duomo-pos-uru-01",
+      "pilot-duomo-pos-san-01",
+      "pilot-duomo-pos-tam-01",
+      "pilot-duomo-obe-sar-01",
+      "pilot-duomo-eld-san-01",
+      "pilot-duomo-ctes-jun-01",
+      "pilot-duomo-ctes-3ab-01",
+      "pilot-duomo-for-cen-01",
+      "pilot-duomo-for-25m-01",
+      "real-duomo-01",
+      "real-duomo-08",
+      "real-duomo-14",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "14 menciones sobre 104 textos analizados (13.5% del corpus del piloto)",
     dimensions: {
       brand: "Duomo",
       topic: "Infraestructura y remodelación",
       sentiment: "positive",
     },
-    evidenceLevel: "recurrent",
-    methodologyNote: "Extracción de aspectos de Infraestructura, Confort Térmico y Accesibilidad sobre reviews de sucursales inauguradas o remodeladas recientemente.",
-    dataType: "real-pilot",
+    methodologyNote: "Aspectos de Infraestructura y Climatización en sucursales remodeladas.",
+    nonCausalDisclaimer: "Asociación descriptiva · no implica causalidad",
     sourcesDistribution: [
-      { name: "Google Maps", count: 18, pct: 81.8 },
-      { name: "Instagram", count: 3, pct: 13.6 },
-      { name: "Facebook", count: 1, pct: 4.6 },
+      { name: "Google Maps", count: 12, pct: 85.7 },
+      { name: "Instagram", count: 2, pct: 14.3 },
     ],
   },
   {
     id: "insight-prod-02",
     type: "product",
-    title: "Pistacho: Sabor de destino con frustración por agotamiento temprano en plazas clave",
-    observation: "Se registran 9 menciones de clientes que manifiestan haberse trasladado a la sucursal exclusivamente por el sabor Pistacho y encontrarlo agotado antes de las 21:00 hs, particularmente en Corrientes (Junín) y Resistencia (Peatonal).",
-    interpretation: "El Pistacho opera como un 'producto imán' (destination driver); su quiebre de stock no genera una sustitución neutral, sino una penalización directa en el Net Sentiment del cliente que buscaba esa experiencia.",
-    businessQuestion: "¿Debería aumentarse el lote de abastecimiento diario de Pistacho en sucursales de perfil céntrico/gastronómico o habilitar consulta de stock en tiempo real?",
-    evidence: {
-      mentions: 9,
-      analyzedCorpus: 104,
-      prevalence: 8.7,
-      reviewIds: [
-        "pilot-duomo-ctes-jun-04",
-        "pilot-duomo-res-pea-04",
-        "pilot-duomo-pos-cos-04",
-        "pilot-duomo-pos-bol-04",
-        "real-duomo-04",
-        "proto-duomo-07",
-        "proto-duomo-19",
-        "proto-duomo-31",
-      ],
-    },
+    title: "Pistacho: Sabor de destino con fricción por agotamiento antes del horario pico",
+    observedData: "8 menciones reportan haber concurrido específicamente por el sabor Pistacho y encontrarlo agotado en heladera antes de las 21:00 hs en sucursales de alta concurrencia.",
+    pattern: "El sabor genera una conducta de compra con destino específico, cuya no disponibilidad deriva en reseñas con sentimiento negativo directo.",
+    exploratoryHypothesis: "La demanda de Pistacho en plazas gastronómicas céntricas podría requerir mayor abastecimiento diario.",
+    validationRequired: "Revisar horarios promedio de agotamiento de tachos de Pistacho en Corrientes Junín y Resistencia Peatonal.",
+    reviewIds: [
+      "pilot-duomo-ctes-jun-04",
+      "pilot-duomo-res-pea-04",
+      "pilot-duomo-pos-cos-04",
+      "pilot-duomo-pos-bol-04",
+      "real-duomo-04",
+      "proto-duomo-07",
+      "proto-duomo-19",
+      "proto-duomo-31",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "8 menciones sobre 104 textos analizados (7.7% del corpus)",
     dimensions: {
       brand: "Duomo",
       flavor: "Pistacho",
       topic: "Disponibilidad y stock",
       sentiment: "negative",
     },
-    evidenceLevel: "emerging",
-    methodologyNote: "Detección de patrones de insatisfacción ligados a 'viaje motivado por sabor' y 'agotamiento de tacho'.",
-    dataType: "real-pilot",
-    sourcesDistribution: [
-      { name: "Google Maps", count: 7, pct: 77.8 },
-      { name: "Instagram", count: 2, pct: 22.2 },
-    ],
-  },
-  {
-    id: "insight-time-01",
-    type: "time",
-    title: "Variabilidad de servicio percibida entre turno tarde y turno noche",
-    observation: "Aparecen menciones que contrastan la agilidad y cordialidad del turno tarde (16:00 a 19:30 hs) frente a una percepción de menor predisposición o mayor lentitud en el turno nocturno (20:30 a 00:00 hs) en sucursales con doble turno.",
-    interpretation: "La mayor tensión de demanda acumulada durante la noche sumada a la fatiga del equipo de cierre podría estar afectando la consistencia del estándar de atención percibido por el cliente.",
-    businessQuestion: "¿Existen esquemas de rotación, incentivos de pico horario o refuerzos en mostrador que permitan mantener homogéneo el estándar de servicio nocturno?",
-    evidence: {
-      mentions: 8,
-      analyzedCorpus: 104,
-      prevalence: 7.7,
-      reviewIds: [
-        "pilot-duomo-pos-uru-02",
-        "pilot-duomo-pos-tam-03",
-        "pilot-duomo-eld-san-02",
-        "pilot-duomo-res-lav-02",
-        "real-duomo-02",
-        "proto-duomo-09",
-        "proto-duomo-26",
-      ],
-    },
-    dimensions: {
-      brand: "Duomo",
-      timeSlot: "Night",
-      topic: "Atención al cliente",
-    },
-    evidenceLevel: "emerging",
-    methodologyNote: "Análisis cruzado de menciones de 'turno noche' vs 'turno tarde' en reseñas con calificación 2 a 3 estrellas.",
-    dataType: "real-pilot",
+    methodologyNote: "Patrón cualitativo de viaje motivado por sabor y agotamiento de stock.",
+    nonCausalDisclaimer: "Asociación exploratoria · no implica causalidad",
     sourcesDistribution: [
       { name: "Google Maps", count: 6, pct: 75.0 },
       { name: "Instagram", count: 2, pct: 25.0 },
     ],
   },
   {
+    id: "insight-time-01",
+    type: "time",
+    title: "Variabilidad de atención observada entre turno tarde y turno noche",
+    observedData: "7 menciones comparan la agilidad del turno tarde (16:00 a 19:30 hs) frente a percepciones de mayor lentitud o menor predisposición en el turno nocturno (20:30 a 00:00 hs).",
+    pattern: "Aparece una percepción de heterogeneidad de servicio asociada a franjas horarias en locales con doble turno.",
+    exploratoryHypothesis: "La mayor tensión de demanda acumulada en la noche y el desgaste del equipo podrían influir en la percepción del servicio.",
+    validationRequired: "Monitorear esquemas de relevo, dotación de cierre e incentivos de pico horario.",
+    reviewIds: [
+      "pilot-duomo-pos-uru-02",
+      "pilot-duomo-pos-tam-03",
+      "pilot-duomo-eld-san-02",
+      "pilot-duomo-res-lav-02",
+      "real-duomo-02",
+      "proto-duomo-09",
+      "proto-duomo-26",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "7 menciones sobre 104 textos analizados (6.7% del corpus)",
+    dimensions: {
+      brand: "Duomo",
+      timeSlot: "Night",
+      topic: "Atención al cliente",
+    },
+    methodologyNote: "Cruce semántico de menciones de turno noche vs turno tarde en calificaciones 2-3 estrellas.",
+    nonCausalDisclaimer: "Asociación observacional · no implica causalidad",
+    sourcesDistribution: [
+      { name: "Google Maps", count: 5, pct: 71.4 },
+      { name: "Instagram", count: 2, pct: 28.6 },
+    ],
+  },
+  {
     id: "insight-ops-02",
     type: "operations",
-    title: "Medios de pago y conectividad posnet: fricción puntual en horarios de alto volumen",
-    observation: "Se registran 7 comentarios sobre demoras en la línea de cobro atribuidas a fallas temporales de conexión en terminales Posnet o falta de cambio en efectivo en horarios pico.",
-    interpretation: "La congestión de la red celular o fallas en pasarelas de pago digitales generan cuellos de botella transaccionales que retrasan toda la fila de despacho independientemente de la velocidad de los heladeros.",
-    businessQuestion: "¿Existe redundancia de conectividad (doble proveedor / enlace cableado) en las sucursales con mayor concentración de cobro digital en horas pico?",
-    evidence: {
-      mentions: 7,
-      analyzedCorpus: 104,
-      prevalence: 6.7,
-      reviewIds: [
-        "pilot-duomo-pos-ita-04",
-        "pilot-duomo-for-cen-04",
-        "pilot-duomo-ctes-3ab-02",
-        "real-duomo-02",
-        "real-duomo-11",
-        "proto-duomo-14",
-        "proto-duomo-38",
-      ],
-    },
+    title: "Medios de pago y conectividad posnet: fricción puntual en horas de alto volumen",
+    observedData: "7 menciones reportan demoras en línea de caja atribuidas a intermitencia en terminales Posnet o falta de cambio en efectivo en horarios de alta afluencia.",
+    pattern: "La fricción en la instancia transaccional genera demoras en la fila de despacho general.",
+    exploratoryHypothesis: "La inestabilidad de redes celulares o terminales de cobro podría ralentizar la velocidad de caja.",
+    validationRequired: "Evaluar redundancia de conectividad (Wi-Fi dedicado + backup) en sucursales de alta facturación electrónica.",
+    reviewIds: [
+      "pilot-duomo-pos-ita-04",
+      "pilot-duomo-for-cen-04",
+      "pilot-duomo-ctes-3ab-02",
+      "real-duomo-02",
+      "real-duomo-11",
+      "proto-duomo-14",
+      "proto-duomo-38",
+    ],
+    analyzedCorpus: 104,
+    corpusDescription: "7 menciones sobre 104 textos analizados (6.7% del corpus)",
     dimensions: {
       brand: "Duomo",
       topic: "Medios de pago y cobro",
       sentiment: "negative",
     },
-    evidenceLevel: "emerging",
-    methodologyNote: "Filtrado de tópicos transaccionales relacionados con POS, QR, billeteras virtuales y cambio en efectivo.",
-    dataType: "real-pilot",
+    methodologyNote: "Tópicos de cobro electrónico, QR y cambio en efectivo.",
+    nonCausalDisclaimer: "Asociación observacional · no implica causalidad",
     sourcesDistribution: [
       { name: "Google Maps", count: 6, pct: 85.7 },
       { name: "Facebook", count: 1, pct: 14.3 },
@@ -250,72 +260,66 @@ export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
   {
     id: "insight-comp-01",
     type: "competitive",
-    title: "Resiliencia de la percepción de calidad artesanal frente a competidores de bajo desembolso",
-    observation: "En opiniones comparativas que mencionan a competidores masivos, el 76% de los usuarios valida pagar el diferencial de precio de Duomo ($24.500/kg vs $14.000/kg) fundamentado en la textura y cremosidad superior, si bien se observa mayor sensibilidad al precio en plazas periféricas.",
-    interpretation: "La propuesta de valor de Duomo mantiene una posición defensiva sólida gracias a su receta tradicional, aunque requiere atención en zonas donde el desembolso nominal absoluto es una barrera de entrada.",
-    businessQuestion: "¿Conviene introducir formatos intermedios (como potes de 1/2 kg promocionales o combos familiares) para capturar demanda sensible en sucursales barriales sin devaluar el precio por kilo de mostrador?",
-    evidence: {
-      mentions: 15,
-      analyzedCorpus: 180,
-      prevalence: 8.3,
-      reviewIds: [
-        "pilot-duomo-res-pea-01",
-        "pilot-duomo-res-lav-01",
-        "pilot-duomo-obe-lib-01",
-        "real-duomo-05",
-        "real-duomo-10",
-        "proto-duomo-03",
-        "proto-duomo-16",
-        "proto-duomo-28",
-        "proto-duomo-40",
-      ],
-    },
+    title: "Resiliencia en percepción de calidad artesanal frente a competidores de bajo desembolso",
+    observedData: "9 menciones comparativas validan el diferencial de precio de Duomo fundamentado en cremosidad y textura, con mayor sensibilidad al desembolso nominal en plazas periféricas.",
+    pattern: "Se observa una percepción favorable del valor artesanal frente a opciones masivas dentro del corpus regional.",
+    exploratoryHypothesis: "La propuesta de valor tradicional sostiene un posicionamiento defensivo sólido en el segmento medio.",
+    validationRequired: "Analizar elasticidad de demanda por sucursal barrial vs céntrica.",
+    reviewIds: [
+      "pilot-duomo-res-pea-01",
+      "pilot-duomo-res-lav-01",
+      "pilot-duomo-obe-lib-01",
+      "real-duomo-05",
+      "real-duomo-10",
+      "proto-duomo-03",
+      "proto-duomo-16",
+      "proto-duomo-28",
+      "proto-duomo-40",
+    ],
+    analyzedCorpus: 180,
+    corpusDescription: "9 menciones comparativas sobre 180 textos regionales analizados (5.0% del corpus)",
     dimensions: {
       brand: "Duomo",
       topic: "Relación Precio/Calidad",
     },
-    evidenceLevel: "emerging",
-    methodologyNote: "Análisis de benchmarking semántico cruzado entre Duomo, Grido y Cremolatti en el corpus regional.",
-    dataType: "mixed",
+    methodologyNote: "Benchmarking semántico cruzado Duomo vs competidores en el corpus regional.",
+    nonCausalDisclaimer: "Asociación comparativa · no infiere cuota de mercado ni causalidad competitiva",
     sourcesDistribution: [
-      { name: "Google Maps", count: 10, pct: 66.7 },
-      { name: "Instagram", count: 3, pct: 20.0 },
-      { name: "Facebook", count: 2, pct: 13.3 },
+      { name: "Google Maps", count: 6, pct: 66.7 },
+      { name: "Instagram", count: 2, pct: 22.2 },
+      { name: "Facebook", count: 1, pct: 11.1 },
     ],
   },
   {
     id: "insight-context-01",
     type: "context",
-    title: "Enriquecimiento Contextual: Correlación preliminar Clima × Demanda y Fricción de Espera",
-    observation: "En jornadas donde la temperatura ambiente estimada supera los 34°C, las menciones referidas a calor en filas exteriores y demoras de despacho se incrementan un 42% respecto de jornadas templadas. (Nota: La asociación no implica causalidad).",
-    interpretation: "Las condiciones térmicas severas amplifican el costo psicológico de la espera en vereda, incrementando la propensión a dejar reseñas negativas por tiempos de espera que en clima templado se tolerarían.",
-    businessQuestion: "¿Podrían evaluarse medidas de mitigación como aspersores de bruma, toldos extendidos o pre-ordenamiento digital en fila durante alertas meteorológicas por calor extremo?",
-    evidence: {
-      mentions: 11,
-      analyzedCorpus: 65,
-      prevalence: 16.9,
-      reviewIds: [
-        "pilot-duomo-pos-bol-04",
-        "pilot-duomo-pos-cos-03",
-        "pilot-duomo-for-cen-04",
-        "pilot-duomo-ctes-jun-03",
-        "real-duomo-07",
-        "proto-duomo-05",
-        "proto-duomo-18",
-      ],
-    },
+    title: "Asociación exploratoria: Jornadas de alta temperatura y percepción de espera en fila",
+    observedData: "7 menciones en jornadas estimadas sobre 34°C reportan mayor incomodidad en la espera exterior frente a jornadas templadas.",
+    pattern: "Se registra una correlación exploratoria entre estrés térmico ambiental y propensión a registrar quejas por tiempo de espera.",
+    exploratoryHypothesis: "El calor en vereda amplifica el costo psicológico de la espera en fila exterior sin implicar que la temperatura sea la causa única.",
+    validationRequired: "Contrastar con registros meteorológicos auditados y tiempos reales de mostrador.",
+    reviewIds: [
+      "pilot-duomo-pos-bol-04",
+      "pilot-duomo-pos-cos-03",
+      "pilot-duomo-for-cen-04",
+      "pilot-duomo-ctes-jun-03",
+      "real-duomo-07",
+      "proto-duomo-05",
+      "proto-duomo-18",
+    ],
+    analyzedCorpus: 65,
+    corpusDescription: "7 menciones sobre 65 textos contextuales seleccionados (10.8% del subcorpus)",
     dimensions: {
       province: "Misiones",
       topic: "Tiempo de espera y filas",
       timeSlot: "Night",
     },
-    evidenceLevel: "limited",
-    methodologyNote: "Muestra reducida. Análisis preliminar integrando estimaciones térmicas regionales del NEA. La asociación estadística no prueba causalidad unívoca.",
-    dataType: "prototype",
+    methodologyNote: "Asociación estadística preliminar en submuestra térmica. No prueba causalidad unívoca.",
+    nonCausalDisclaimer: "Asociación exploratoria · no implica causalidad meteorológica",
     isSmallSample: true,
     sourcesDistribution: [
-      { name: "Google Maps", count: 9, pct: 81.8 },
-      { name: "Instagram", count: 2, pct: 18.2 },
+      { name: "Google Maps", count: 6, pct: 85.7 },
+      { name: "Instagram", count: 1, pct: 14.3 },
     ],
     contextData: {
       weather: {
@@ -324,7 +328,8 @@ export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
         condition: "Caluroso / Ola de calor",
         precipitation: 0,
         humidity: 68,
-        dataSource: "Estación Meteorológica Regional Posadas (Simulado)",
+        dataSource: "Estación Regional Posadas (Simulado)",
+        status: "available",
       },
       calendar: {
         isWeekend: true,
@@ -333,6 +338,78 @@ export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = [
     },
   },
 ];
+
+/**
+ * Build canonical insights with dynamically derived metrics and strict data lineage
+ */
+export const CANONICAL_BUSINESS_INSIGHTS: BusinessInsight[] = RAW_INSIGHT_DEFINITIONS.map(
+  (def) => {
+    const uniqueReviewIds = Array.from(new Set(def.reviewIds));
+    const mentions = uniqueReviewIds.length;
+    const analyzedCorpus = def.analyzedCorpus;
+    const prevalence =
+      analyzedCorpus > 0 ? Number(((mentions / analyzedCorpus) * 100).toFixed(1)) : 0;
+
+    const dataType = deriveInsightDataType(uniqueReviewIds);
+    const signalStrength = deriveSignalStrength(mentions, analyzedCorpus, prevalence);
+    const managementAttention = deriveManagementAttention(
+      signalStrength,
+      def.dimensions.sentiment,
+      def.dimensions.topic
+    );
+
+    // Map evidence level for legacy compatibility
+    const evidenceLevel: BusinessInsight["evidenceLevel"] =
+      signalStrength === "CRITICAL OBSERVATIONAL SIGNAL" ||
+      signalStrength === "HIGH PREVALENCE SIGNAL" ||
+      signalStrength === "RECURRENT PATTERN"
+        ? "recurrent"
+        : signalStrength === "EMERGING SIGNAL"
+        ? "emerging"
+        : "limited";
+
+    return {
+      id: def.id,
+      type: def.type,
+      title: def.title,
+      // Structured Epistemological Properties
+      observedData: def.observedData,
+      pattern: def.pattern,
+      exploratoryHypothesis: def.exploratoryHypothesis,
+      validationRequired: def.validationRequired,
+      // Backward-compat aliases
+      observation: def.observedData,
+      interpretation: def.exploratoryHypothesis,
+      businessQuestion: def.validationRequired,
+      evidence: {
+        mentions,
+        analyzedCorpus,
+        prevalence,
+        reviewIds: uniqueReviewIds,
+        uniqueReviewIds,
+        corpusDescription: def.corpusDescription,
+      },
+      dimensions: def.dimensions,
+      evidenceLevel,
+      signalStrength,
+      managementAttention,
+      managementAttentionReason:
+        managementAttention === "HIGH ATTENTION"
+          ? "Alta concentración observacional en el corpus analizado"
+          : managementAttention === "ATTENTION"
+          ? "Patrón recurrente observado en múltiples sucursales o franjas horarias"
+          : managementAttention === "WATCH"
+          ? "Señal emergente en tópicos operacionales con oportunidad de seguimiento"
+          : undefined,
+      methodologyNote: def.methodologyNote,
+      nonCausalDisclaimer: def.nonCausalDisclaimer || "Asociación exploratoria · no implica causalidad",
+      dataType,
+      isSmallSample: def.isSmallSample,
+      sourcesDistribution: def.sourcesDistribution,
+      contextData: def.contextData,
+    };
+  }
+);
 
 /**
  * Filter insights dynamically based on active filters
@@ -377,17 +454,20 @@ export function getFilteredInsights(filters: GlobalFilters): BusinessInsight[] {
     }
     // Data Mode
     if (filters.dataMode && filters.dataMode !== "all") {
-      if (filters.dataMode === "real-pilot" && insight.dataType !== "real-pilot") return false;
+      if (filters.dataMode === "unverified-pilot" && insight.dataType !== "unverified-pilot") return false;
       if (filters.dataMode === "prototype" && insight.dataType !== "prototype") return false;
+      if (filters.dataMode === "verified-public" && insight.dataType !== "verified-public") return false;
+      if (filters.dataMode === "mixed" && insight.dataType !== "mixed") return false;
     }
     // Search Query
     if (filters.searchQuery && filters.searchQuery.trim() !== "") {
       const q = filters.searchQuery.toLowerCase();
       const matchTitle = insight.title.toLowerCase().includes(q);
-      const matchObs = insight.observation.toLowerCase().includes(q);
-      const matchInterp = insight.interpretation.toLowerCase().includes(q);
-      const matchQ = insight.businessQuestion.toLowerCase().includes(q);
-      if (!matchTitle && !matchObs && !matchInterp && !matchQ) return false;
+      const matchObs = (insight.observedData || insight.observation).toLowerCase().includes(q);
+      const matchPattern = (insight.pattern || "").toLowerCase().includes(q);
+      const matchInterp = (insight.exploratoryHypothesis || insight.interpretation).toLowerCase().includes(q);
+      const matchQ = (insight.validationRequired || insight.businessQuestion).toLowerCase().includes(q);
+      if (!matchTitle && !matchObs && !matchPattern && !matchInterp && !matchQ) return false;
     }
     return true;
   });

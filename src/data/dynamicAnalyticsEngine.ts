@@ -3,13 +3,13 @@ import { REAL_REVIEWS } from "./realReviews";
 import { REAL_PILOT_REVIEWS } from "./realPilotReviews";
 import { CANONICAL_BRANCHES } from "./canonicalBranches";
 import { PROTOTYPE_REVIEWS } from "./prototypeMetrics";
+import { enrichReviewWithStrictTemporalContext } from "../utils/methodologicalValidation";
 
 const DAYS_ES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 export function enrichReviewTemporal(r: Review): Review {
   let dayOfWeek = r.dayOfWeek;
   let isWeekend = r.isWeekend;
-  let timeSlot: TimeSlot = r.timeSlot || "Unknown";
 
   if (r.date) {
     const d = new Date(r.date + "T12:00:00Z");
@@ -20,55 +20,17 @@ export function enrichReviewTemporal(r: Review): Review {
     }
   }
 
-  // Infer time slot only if explicit signals in text or already set
-  if (!r.timeSlot || r.timeSlot === "Unknown") {
-    const txt = r.text.toLowerCase();
-    if (
-      txt.includes("noche") ||
-      txt.includes("cena") ||
-      txt.includes("21:") ||
-      txt.includes("22:") ||
-      txt.includes("23:") ||
-      txt.includes("20:") ||
-      txt.includes("00:") ||
-      txt.includes("salida de noche")
-    ) {
-      timeSlot = "Night";
-    } else if (
-      txt.includes("tarde") ||
-      txt.includes("siesta") ||
-      txt.includes("merienda") ||
-      txt.includes("16:") ||
-      txt.includes("17:") ||
-      txt.includes("18:") ||
-      txt.includes("19:")
-    ) {
-      timeSlot = "Afternoon";
-    } else if (
-      txt.includes("mañana") ||
-      txt.includes("desayuno") ||
-      txt.includes("mediodía") ||
-      txt.includes("10:") ||
-      txt.includes("11:") ||
-      txt.includes("12:")
-    ) {
-      timeSlot = "Morning";
-    } else {
-      timeSlot = "Unknown";
-    }
-  } else {
-    timeSlot = r.timeSlot;
-  }
-
-  return {
+  const reviewWithDays = {
     ...r,
     dayOfWeek,
     isWeekend,
-    timeSlot,
   };
+
+  // Apply strict methodological temporal enrichment & weather eligibility guardrails
+  return enrichReviewWithStrictTemporalContext(reviewWithDays);
 }
 
-// Complete pool of all reviews including the verified Real Pilot Dataset
+// Complete pool of all reviews including the structured Pilot Dataset
 export const ALL_REVIEWS_POOL: Review[] = [
   ...REAL_PILOT_REVIEWS.map(enrichReviewTemporal),
   ...REAL_REVIEWS.map(enrichReviewTemporal),
@@ -84,11 +46,19 @@ export function getFilteredReviews(filters: GlobalFilters): Review[] {
   }
 
   return ALL_REVIEWS_POOL.filter((r) => {
+    // Verification status filter
+    if (filters.verificationStatusFilter && filters.verificationStatusFilter !== "Todos") {
+      const status = r.provenance?.verificationStatus;
+      if (filters.verificationStatusFilter === "verified" && status !== "verified") return false;
+      if (filters.verificationStatusFilter === "pending" && status !== "pending") return false;
+      if (filters.verificationStatusFilter === "prototype" && r.dataType !== "prototype") return false;
+    }
     // Data Mode filter
     if (filters.dataMode && filters.dataMode !== "all") {
-      if (filters.dataMode === "real-pilot" && r.dataType !== "real-pilot") return false;
+      if (filters.dataMode === "unverified-pilot" && r.dataType !== "unverified-pilot") return false;
       if (filters.dataMode === "prototype" && r.dataType !== "prototype") return false;
-      if (filters.dataMode === "unverified-seed" && r.dataType !== "unverified-seed") return false;
+      if (filters.dataMode === "verified-public" && r.dataType !== "verified-public") return false;
+      if (filters.dataMode === "mixed" && r.dataType !== "mixed") return false;
     }
     // Brand
     if (filters.brand && filters.brand !== "Todas" && r.brand !== filters.brand) {

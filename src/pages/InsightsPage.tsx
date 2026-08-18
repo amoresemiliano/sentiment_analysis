@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { BusinessInsight, GlobalFilters, TimeSlot } from "../types";
+import { BusinessInsight, GlobalFilters, TimeSlot, SignalStrength } from "../types";
 import { CANONICAL_BUSINESS_INSIGHTS, getFilteredInsights } from "../data/businessInsights";
 import { InsightCard } from "../components/insights/InsightCard";
 import { TimeSlotBreakdown } from "../components/insights/TimeSlotBreakdown";
@@ -17,6 +17,8 @@ import {
   Clock,
   ArrowUpDown,
   BookOpen,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 
 interface InsightsPageProps {
@@ -31,7 +33,7 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
   onNavigateToReviewsWithFilter,
 }) => {
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedLevel, setSelectedLevel] = useState<string>("all");
+  const [selectedSignalStrength, setSelectedSignalStrength] = useState<string>("all");
   const [selectedDataOrigin, setSelectedDataOrigin] = useState<string>("all");
   const [localSearch, setLocalSearch] = useState<string>("");
 
@@ -47,33 +49,41 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
       if (selectedType !== "all" && ins.type !== selectedType) {
         return false;
       }
-      // Level
-      if (selectedLevel !== "all" && ins.evidenceLevel !== selectedLevel) {
+      // Signal Strength
+      if (selectedSignalStrength !== "all" && ins.signalStrength !== selectedSignalStrength) {
         return false;
       }
       // Origin
       if (selectedDataOrigin !== "all") {
-        if (selectedDataOrigin === "real-pilot" && ins.dataType !== "real-pilot") return false;
+        if (selectedDataOrigin === "unverified-pilot" && ins.dataType !== "unverified-pilot") return false;
         if (selectedDataOrigin === "prototype" && ins.dataType !== "prototype") return false;
+        if (selectedDataOrigin === "mixed" && ins.dataType !== "mixed") return false;
+        if (selectedDataOrigin === "verified-public" && ins.dataType !== "verified-public") return false;
       }
       // Search
       if (localSearch.trim() !== "") {
         const q = localSearch.toLowerCase();
         const matchTitle = ins.title.toLowerCase().includes(q);
-        const matchObs = ins.observation.toLowerCase().includes(q);
-        const matchInterp = ins.interpretation.toLowerCase().includes(q);
-        const matchQ = ins.businessQuestion.toLowerCase().includes(q);
-        if (!matchTitle && !matchObs && !matchInterp && !matchQ) return false;
+        const matchObs = (ins.observedData || ins.observation).toLowerCase().includes(q);
+        const matchPattern = (ins.pattern || "").toLowerCase().includes(q);
+        const matchInterp = (ins.exploratoryHypothesis || ins.interpretation).toLowerCase().includes(q);
+        const matchQ = (ins.validationRequired || ins.businessQuestion).toLowerCase().includes(q);
+        if (!matchTitle && !matchObs && !matchPattern && !matchInterp && !matchQ) return false;
       }
       return true;
     });
-  }, [baseInsights, selectedType, selectedLevel, selectedDataOrigin, localSearch]);
+  }, [baseInsights, selectedType, selectedSignalStrength, selectedDataOrigin, localSearch]);
 
   // Statistics counters
   const totalCount = baseInsights.length;
-  const recurrentCount = baseInsights.filter((i) => i.evidenceLevel === "recurrent").length;
-  const emergingCount = baseInsights.filter((i) => i.evidenceLevel === "emerging").length;
-  const realPilotCount = baseInsights.filter((i) => i.dataType === "real-pilot").length;
+  const recurrentCount = baseInsights.filter(
+    (i) => i.signalStrength === "RECURRENT PATTERN" || i.signalStrength === "HIGH PREVALENCE SIGNAL"
+  ).length;
+  const emergingCount = baseInsights.filter((i) => i.signalStrength === "EMERGING SIGNAL").length;
+  const unverifiedPilotCount = baseInsights.filter((i) => i.dataType === "unverified-pilot").length;
+  const attentionCount = baseInsights.filter(
+    (i) => i.managementAttention === "ATTENTION" || i.managementAttention === "HIGH ATTENTION"
+  ).length;
 
   const handleTimeSlotSelect = (slot: TimeSlot | "Todos") => {
     if (slot === "Todos") {
@@ -92,10 +102,10 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-950 border border-emerald-300 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-[#1B4D3E]" />
-                <span>Capa Analítica · Iteración 5</span>
+                <span>Capa Analítica · Iteración 5.1</span>
               </span>
-              <span className="text-xs text-stone-500 font-medium">
-                Trazabilidad Review-a-Insight
+              <span className="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold">
+                Linaje: Piloto No Verificado + Prototipo
               </span>
             </div>
 
@@ -104,8 +114,7 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
             </h1>
             <p className="text-xs sm:text-sm text-stone-600 max-w-3xl leading-relaxed">
               Transformación de conjuntos de opiniones y señales de clientes en líneas de interpretación empresarial
-              fundamentadas. Cada insight expone qué se observó, dónde, cuándo, cuánto sustento existe y qué preguntas
-              debería plantearse la dirección antes de actuar.
+              trazables. Cada insight distingue estrictamente entre <strong>Hecho Observado</strong>, <strong>Patrón Descriptivo</strong>, <strong>Hipótesis Explicativa</strong> y <strong>Validación Requerida</strong>.
             </p>
           </div>
 
@@ -119,23 +128,23 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
             </div>
 
             <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl">
-              <span className="text-[10px] text-emerald-800 block font-bold uppercase">Recurrentes</span>
+              <span className="text-[10px] text-emerald-800 block font-bold uppercase">Patrones Recurrentes</span>
               <strong className="text-base font-extrabold text-emerald-950 font-['Outfit']">
                 {recurrentCount}
               </strong>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
-              <span className="text-[10px] text-amber-800 block font-bold uppercase">Emergentes</span>
+              <span className="text-[10px] text-amber-800 block font-bold uppercase">Señales Emergentes</span>
               <strong className="text-base font-extrabold text-amber-950 font-['Outfit']">
                 {emergingCount}
               </strong>
             </div>
 
-            <div className="bg-sky-50 border border-sky-200 p-2.5 rounded-xl">
-              <span className="text-[10px] text-sky-800 block font-bold uppercase">Real Pilot</span>
-              <strong className="text-base font-extrabold text-sky-950 font-['Outfit']">
-                {realPilotCount}
+            <div className="bg-rose-50 border border-rose-200 p-2.5 rounded-xl">
+              <span className="text-[10px] text-rose-800 block font-bold uppercase">Management Attention</span>
+              <strong className="text-base font-extrabold text-rose-950 font-['Outfit']">
+                {attentionCount}
               </strong>
             </div>
           </div>
@@ -146,9 +155,9 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
           <div className="flex items-start gap-2">
             <BookOpen className="w-4 h-4 text-[#1B4D3E] shrink-0 mt-0.5" />
             <div>
-              <strong className="text-stone-900 font-bold">Principio de No-Dogmatismo:</strong>
+              <strong className="text-stone-900 font-bold">Principio de No-Dogmatismo & Rigor Epistemológico:</strong>
               <span className="ml-1 text-stone-600">
-                Una review individual es evidencia anecdótica. Los insights señalan hipótesis a validar mediante datos operativos de ventas, mermas y auditorías presenciales.
+                “Una opinión puede ser anecdótica. Muchas opiniones coherentes pueden constituir una señal. Una señal fuerte merece atención. Una señal no demuestra por sí sola su causa.”
               </span>
             </div>
           </div>
@@ -168,7 +177,7 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[#1B4D3E]" />
             <h3 className="text-xs font-extrabold text-stone-900 uppercase tracking-wider font-['Outfit']">
-              Filtrar Insights por Eje Temático y Nivel de Evidencia
+              Filtrar Insights por Eje Temático, Fuerza de Señal y Linaje
             </h3>
           </div>
 
@@ -207,20 +216,20 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
 
           <div className="h-4 w-[1px] bg-stone-200 hidden md:block mx-1" />
 
-          {/* Level Selectors */}
+          {/* Signal Strength Selectors */}
           <div className="flex flex-wrap items-center gap-1">
-            <span className="text-[11px] text-stone-400 font-bold mr-1">Evidencia:</span>
+            <span className="text-[11px] text-stone-400 font-bold mr-1">Señal:</span>
             {[
-              { id: "all", label: "Todos los niveles" },
-              { id: "recurrent", label: "Patrón Recurrente" },
-              { id: "emerging", label: "Señal Emergente" },
-              { id: "limited", label: "Evidencia Limitada" },
+              { id: "all", label: "Todas" },
+              { id: "RECURRENT PATTERN", label: "Patrón Recurrente" },
+              { id: "EMERGING SIGNAL", label: "Señal Emergente" },
+              { id: "LIMITED EVIDENCE", label: "Evidencia Limitada" },
             ].map((l) => (
               <button
                 key={l.id}
-                onClick={() => setSelectedLevel(l.id)}
+                onClick={() => setSelectedSignalStrength(l.id)}
                 className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
-                  selectedLevel === l.id
+                  selectedSignalStrength === l.id
                     ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                     : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100"
                 }`}
@@ -237,7 +246,8 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
             <span className="text-[11px] text-stone-400 font-bold mr-1">Dataset:</span>
             {[
               { id: "all", label: "Todos" },
-              { id: "real-pilot", label: "Real Pilot (Verificadas)" },
+              { id: "unverified-pilot", label: "Piloto (No Verificado)" },
+              { id: "mixed", label: "Mixto" },
               { id: "prototype", label: "Prototipo" },
             ].map((o) => (
               <button
@@ -292,7 +302,7 @@ export const InsightsPage: React.FC<InsightsPageProps> = ({
             <button
               onClick={() => {
                 setSelectedType("all");
-                setSelectedLevel("all");
+                setSelectedSignalStrength("all");
                 setSelectedDataOrigin("all");
                 setLocalSearch("");
                 onUpdateFilters({ timeSlot: null, brand: null, province: null, flavor: null });

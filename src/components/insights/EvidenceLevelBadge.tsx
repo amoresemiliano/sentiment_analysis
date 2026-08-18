@@ -1,53 +1,75 @@
 import React from "react";
-import { BusinessInsight } from "../../types";
-import { ShieldCheck, AlertCircle, Sparkles, Database } from "lucide-react";
+import { BusinessInsight, DataType, ManagementAttentionLevel, SignalStrength } from "../../types";
+import { ShieldCheck, AlertCircle, Sparkles, Database, Eye, AlertTriangle } from "lucide-react";
 
 interface EvidenceLevelBadgeProps {
-  level: BusinessInsight["evidenceLevel"];
-  dataType: BusinessInsight["dataType"];
+  signalStrength?: SignalStrength;
+  level?: BusinessInsight["evidenceLevel"];
+  dataType: DataType;
+  managementAttention?: ManagementAttentionLevel;
   isSmallSample?: boolean;
 }
 
 export const EvidenceLevelBadge: React.FC<EvidenceLevelBadgeProps> = ({
+  signalStrength,
   level,
   dataType,
+  managementAttention,
   isSmallSample,
 }) => {
-  const getLevelConfig = () => {
-    switch (level) {
-      case "recurrent":
+  const getSignalStrengthConfig = () => {
+    switch (signalStrength) {
+      case "CRITICAL OBSERVATIONAL SIGNAL":
+        return {
+          label: "Señal Observacional Crítica",
+          classes: "bg-rose-100 text-rose-900 border-rose-300",
+          desc: "Concentración observacional >=60% con persistencia multicanal",
+        };
+      case "HIGH PREVALENCE SIGNAL":
+        return {
+          label: "Alta Prevalencia Observada",
+          classes: "bg-purple-100 text-purple-900 border-purple-300",
+          desc: "Alta concentración de menciones dentro del corpus seleccionado",
+        };
+      case "RECURRENT PATTERN":
         return {
           label: "Patrón Recurrente",
           classes: "bg-emerald-100 text-emerald-900 border-emerald-300",
-          desc: "Concentración clara dentro del corpus analizado",
+          desc: "Concentración clara observada en el corpus analizado",
         };
-      case "emerging":
+      case "EMERGING SIGNAL":
         return {
           label: "Señal Emergente",
           classes: "bg-amber-100 text-amber-900 border-amber-300",
           desc: "Patrón con repetición incipiente en sucursales",
         };
-      case "limited":
+      case "LIMITED EVIDENCE":
       default:
         return {
           label: "Evidencia Limitada",
           classes: "bg-stone-100 text-stone-700 border-stone-300",
-          desc: "Pocos registros o baja prevalencia relativa",
+          desc: "Pocos registros o submuestra exploratoria",
         };
     }
   };
 
   const getDataTypeConfig = () => {
     switch (dataType) {
-      case "real-pilot":
+      case "verified-public":
         return {
-          label: "REAL PILOT INSIGHT",
+          label: "VERIFIED PUBLIC INSIGHT",
           dot: "bg-emerald-500",
           classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
         };
+      case "unverified-pilot":
+        return {
+          label: "PILOT DATA — PENDING VERIFICATION",
+          dot: "bg-amber-500",
+          classes: "bg-amber-50 text-amber-800 border-amber-200",
+        };
       case "mixed":
         return {
-          label: "MIXED INSIGHT",
+          label: "MIXED EVIDENCE",
           dot: "bg-sky-500",
           classes: "bg-sky-50 text-sky-800 border-sky-200",
         };
@@ -55,38 +77,43 @@ export const EvidenceLevelBadge: React.FC<EvidenceLevelBadgeProps> = ({
       default:
         return {
           label: "PROTOTYPE INSIGHT",
-          dot: "bg-amber-500",
-          classes: "bg-amber-50 text-amber-800 border-amber-200",
+          dot: "bg-stone-400",
+          classes: "bg-stone-100 text-stone-700 border-stone-200",
         };
     }
   };
 
-  const levelConfig = getLevelConfig();
+  const signalConfig = getSignalStrengthConfig();
   const dataConfig = getDataTypeConfig();
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 font-['Plus_Jakarta_Sans']">
-      {/* Evidence Level Badge */}
+    <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
+      {/* Signal Strength Badge */}
       <span
-        className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border uppercase tracking-wider ${levelConfig.classes}`}
-        title={levelConfig.desc}
+        title={signalConfig.desc}
+        className={`px-2 py-0.5 rounded-md border font-extrabold flex items-center gap-1 ${signalConfig.classes}`}
       >
-        {levelConfig.label}
+        <Sparkles className="w-2.5 h-2.5 shrink-0" />
+        <span>{signalConfig.label}</span>
       </span>
 
-      {/* Dataset Type Badge */}
+      {/* Data Lineage Badge */}
       <span
-        className={`text-[10px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1 ${dataConfig.classes}`}
+        title={`Origen metodológico: ${dataConfig.label}`}
+        className={`px-2 py-0.5 rounded-md border flex items-center gap-1.5 font-bold tracking-tight ${dataConfig.classes}`}
       >
-        <span className={`w-1.5 h-1.5 rounded-full ${dataConfig.dot}`} />
+        <span className={`w-1.5 h-1.5 rounded-full ${dataConfig.dot} shrink-0 animate-pulse`} />
         <span>{dataConfig.label}</span>
       </span>
 
-      {/* Small Sample Warning */}
+      {/* Small sample warning */}
       {isSmallSample && (
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 border border-stone-200 flex items-center gap-0.5">
-          <AlertCircle className="w-3 h-3 text-amber-600 shrink-0" />
-          <span>Muestra reducida</span>
+        <span
+          title="Muestra menor a 15 opiniones. Interpretar con cautela exploratoria."
+          className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 text-[9px] flex items-center gap-0.5"
+        >
+          <AlertCircle className="w-2.5 h-2.5 text-stone-400" />
+          <span>Muestra Reducida</span>
         </span>
       )}
     </div>

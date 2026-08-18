@@ -1,6 +1,39 @@
 export type Brand = "Duomo" | "Grido" | "Cremolatti" | "Todas";
 export type SentimentLabel = "positive" | "neutral" | "negative";
-export type DataType = "real" | "prototype" | "real-pilot" | "unverified-seed";
+export type DataType =
+  | "verified-public"
+  | "unverified-pilot"
+  | "prototype"
+  | "mixed";
+
+export type VerificationStatus = "verified" | "pending" | "failed" | "not-applicable" | "prototype";
+
+export type SignalStrength =
+  | "LIMITED EVIDENCE"
+  | "EMERGING SIGNAL"
+  | "RECURRENT PATTERN"
+  | "HIGH PREVALENCE SIGNAL"
+  | "CRITICAL OBSERVATIONAL SIGNAL";
+
+export type ManagementAttentionLevel = "WATCH" | "ATTENTION" | "HIGH ATTENTION" | "NONE";
+
+export interface EvidenceProvenance {
+  dataType: DataType;
+  sourceUrl?: string;
+  verificationStatus: VerificationStatus;
+  verifiedAt?: string;
+  verificationMethod?: string;
+}
+
+export interface ReviewTemporalContext {
+  publishedDate?: string;
+  publishedTime?: string;
+  experienceDate?: string;
+  experienceTime?: string;
+  experienceTimeSource?: "explicit-text" | "structured-source" | "inferred" | "unknown";
+  experienceTimeConfidence?: "high" | "medium" | "low";
+}
+
 export type Source = "Google" | "Instagram" | "Facebook" | "TikTok" | "YouTube" | "Tripadvisor" | "Todas";
 export type Province = "Misiones" | "Corrientes" | "Chaco" | "Formosa" | "Todas";
 export type TimeSlot = "Morning" | "Afternoon" | "Night" | "Unknown";
@@ -21,6 +54,7 @@ export interface ReviewContext {
     precipitation?: number;
     humidity?: number;
     dataSource?: string;
+    status?: "available" | "unavailable";
   } | null;
   calendar?: {
     isWeekend: boolean;
@@ -49,13 +83,16 @@ export interface Review {
   isWeekend?: boolean;
   timeOfDay?: string;
   timeSlot?: TimeSlot;
+  temporalContext?: ReviewTemporalContext;
+  weatherEligible?: boolean;
   contextData?: ReviewContext | null;
   rating?: number;
   text: string;
   author?: string;
   flavor?: string;
   dataType: DataType;
-  isRealPilot?: boolean;
+  provenance?: EvidenceProvenance;
+  isRealPilot?: boolean; // legacy alias
   sourceUrl?: string;
   url?: string;
   collectedAt?: string;
@@ -80,7 +117,8 @@ export interface RealPilotReview {
   text: string;
   sourceUrl: string;
   collectedAt: string;
-  dataType: "real-pilot";
+  dataType: "unverified-pilot";
+  provenance?: EvidenceProvenance;
   sentimentLabel?: SentimentLabel;
   sentimentScore?: number;
   topics?: string[];
@@ -88,6 +126,8 @@ export interface RealPilotReview {
   dayOfWeek?: string;
   isWeekend?: boolean;
   timeSlot?: TimeSlot;
+  temporalContext?: ReviewTemporalContext;
+  weatherEligible?: boolean;
   contextData?: ReviewContext | null;
 }
 
@@ -102,14 +142,22 @@ export interface BusinessInsight {
     | "marketing"
     | "competitive";
   title: string;
+  // Rigorous Epistemological Architecture
+  observedData: string; // Hecho observado
+  pattern: string; // Patrón descriptivo
+  exploratoryHypothesis: string; // Hipótesis explicativa
+  validationRequired: string; // Validación requerida
+  // Backward compatibility aliases
   observation: string;
   interpretation: string;
   businessQuestion: string;
   evidence: {
-    mentions: number;
+    mentions: number; // derived from unique review IDs
     analyzedCorpus: number;
-    prevalence: number;
+    prevalence: number; // derived (max 1 decimal)
     reviewIds: string[];
+    uniqueReviewIds?: string[];
+    corpusDescription?: string; // Denominador explícito contextual
   };
   dimensions: {
     brand?: string;
@@ -123,9 +171,13 @@ export interface BusinessInsight {
     timeSlot?: string;
     isWeekend?: boolean;
   };
-  evidenceLevel: "limited" | "emerging" | "recurrent";
+  evidenceLevel: "limited" | "emerging" | "recurrent"; // legacy
+  signalStrength: SignalStrength;
+  managementAttention: ManagementAttentionLevel;
+  managementAttentionReason?: string;
   methodologyNote?: string;
-  dataType: "real-pilot" | "prototype" | "mixed";
+  nonCausalDisclaimer?: string;
+  dataType: DataType;
   isSmallSample?: boolean;
   sourcesDistribution?: { name: string; count: number; pct: number }[];
   contextData?: ReviewContext | null;
@@ -147,8 +199,9 @@ export interface GlobalFilters {
   isWeekend?: boolean | null;
   insightId?: string | null;
   targetReviewIds?: string[] | null;
-  dataMode?: "all" | "prototype" | "real-pilot" | "unverified-seed" | null;
-  dataTypeFilter?: "Todas" | "real-pilot" | "prototype" | "unverified-seed" | null;
+  dataMode?: "all" | "prototype" | "unverified-pilot" | "verified-public" | "mixed" | null;
+  verificationStatusFilter?: "Todos" | "verified" | "pending" | "prototype" | null;
+  dataTypeFilter?: "Todas" | "unverified-pilot" | "verified-public" | "prototype" | "mixed" | null;
 }
 
 export type FilterState = GlobalFilters;

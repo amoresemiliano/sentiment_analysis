@@ -1,26 +1,34 @@
-# Data Provenance & Methodology: El Sabor de la IA by Duomo Helados
+# Data Provenance, Lineage & Methodological Guardrails: El Sabor de la IA by Duomo Helados
 
-## 1. Executive Summary
+## 1. Resumen Ejecutivo & Marco Epistemológico (Iteración 5.1)
 
-Este documento detalla el origen, metodología de recolección, proceso de normalización y criterios de validez de los datos utilizados en la plataforma **El Sabor de la IA by Duomo Helados**, desarrollada en el marco del Trabajo Práctico de **AI for Business** para el **Master in Business & Technology de la Universidad de San Andrés (UdeSA)**.
+Este documento describe la arquitectura de linaje, auditoría de evidencia y salvaguardas metodológicas de la plataforma **El Sabor de la IA by Duomo Helados**, desarrollada en el marco del Trabajo Práctico de **AI for Business** para el **Master in Business & Technology de la Universidad de San Andrés (UdeSA)**.
 
----
+### Principio Rector
+> *"Una opinión puede ser anecdótica. Muchas opiniones coherentes pueden constituir una señal. Una señal fuerte merece atención. Una señal no demuestra por sí sola su causa."*
 
-## 2. Clasificación y Taxonomía de Datos
-
-La plataforma utiliza una arquitectura de datos dual y transparente:
-
-| Capa de Datos | Tipo (`dataType`) | Muestra | Descripción y Validez |
-|---|---|---|---|
-| **Piloto de Reseñas Reales** | `real-pilot` | 104 opiniones en 15 sucursales | Datos públicos reales extraídos de Google Maps / Google Business Profiles, Instagram y Facebook de Helados Duomo. Cada reseña contiene su URL de origen, fecha de publicación, autor público, rating y texto verbatim. |
-| **Corpus Prototipo Simulado** | `prototype` | ~2,780 registros | Generado sintéticamente con modelos probabilísticos calibrados para representar el comportamiento proyectado de las 90 sucursales en las 4 provincias del NEA (Misiones, Corrientes, Chaco y Formosa). |
-| **Seed No Verificado** | `unverified-seed` | 11 registros | Registros de prueba iniciales reclasificados preventivamente para evitar sesgo en el piloto analítico. |
+El sistema distingue cuatro niveles epistemológicos:
+1. **Hecho Observado (`observedData`)**: Recuento empírico exacto de verbatims y menciones en el corpus estructurado.
+2. **Patrón Descriptivo (`pattern`)**: Concentración observacional, recurrencia temática o polaridad relativa.
+3. **Hipótesis Explicativa (`exploratoryHypothesis`)**: Interpretación probabilística sugerida para investigación (nunca presentada como causa probada).
+4. **Validación Requerida (`validationRequired`)**: Preguntas operativas y contrastaciones gerenciales (ventas, mermas, dotación de personal) requeridas antes de tomar decisiones de inversión o reestructuración.
 
 ---
 
-## 3. Cobertura del Piloto Real (15 Sucursales Duomo)
+## 2. Taxonomía de Linaje de Datos (`dataType`)
 
-El piloto real cubre **15 sucursales clave de Helados Duomo** distribuidas en las 4 provincias de actuación en el Nordeste Argentino (NEA):
+| Capa de Datos | Tipo (`dataType`) | Estado de Verificación | Registros | Criterios y Restricciones de Uso |
+|---|---|---|---|---|
+| **Piloto de Reseñas de Campo** | `unverified-pilot` | `pending` (Auditado en formato) | 104 opiniones en 15 sucursales | Corpus estructurado con URL de perfil, autor público, timestamp, rating y texto verbatim. **No se promueve automáticamente a `verified-public`** sin proceso de verificación y hashing criptográfico. |
+| **Corpus Prototipo Simulado** | `prototype` | `prototype` | ~2,780 registros | Generado sintéticamente con modelos probabilísticos calibrados para representar el comportamiento proyectado de las 90 sucursales en las 4 provincias del NEA. |
+| **Evidencia Mixta** | `mixed` | Variable | Variable | Insights que integran verbatims del piloto (`unverified-pilot`) junto a registros de referencia (`prototype`). |
+| **Público Verificado** | `verified-public` | `verified` | 0 (En proceso de ingesta auditada) | Reservado exclusivamente para opiniones con firma de recolección y verificación criptográfica/humana completa. |
+
+---
+
+## 3. Cobertura del Piloto de 15 Sucursales Duomo (104 Registros)
+
+El dataset de 104 opiniones cubre 15 sucursales estratégicas de Duomo Helados en el Nordeste Argentino:
 
 ### Misiones (56 reseñas)
 1. **Posadas — Sucursal Bolívar (Centro)** (8 reseñas) · `duomo-pos-bolivar`
@@ -47,22 +55,27 @@ El piloto real cubre **15 sucursales clave de Helados Duomo** distribuidas en la
 
 ---
 
-## 4. Pipeline de Ingesta, Normalización y Enriquecimiento
+## 4. Reglas Metodológicas de Validación de Insights
 
-El pipeline de ingesta offline está compuesto por 3 scripts modulares en `/scripts/`:
+1. **Derivación Matemática Estricta**:
+   - `mentions = uniqueReviewIds.length` (recuento deduplicado).
+   - `prevalence = (mentions / analyzedCorpus) * 100` (con un decimal).
+   - `analyzedCorpus >= mentions` (invariante fundamental).
 
-1. **`collectPublicReviews.ts`**: Simula la ingesta controlada de perfiles abiertos cumpliendo con los términos de servicio (TOS) y privacidad pública.
-2. **`normalizeReviews.ts`**:
-   - Limpieza de caracteres y remoción de identificadores privados sensibles.
-   - Vinculación canónica a la sucursal y ciudad correspondiente (`canonicalBranches.ts`).
-   - Normalización de escalas de rating (1-5 estrellas).
-3. **`validateReviews.ts`**:
-   - Detección de entidades nombradas (NER de sabores Duomo: Chocolate Dubai, Pistacho, Sambayón con cerezas, etc.).
-   - Asignación de sentimiento a nivel de aspecto (ABSA) y tópicos operacionales.
+2. **Graduación de Fuerza de Señal (`signalStrength`)**:
+   - `CRITICAL OBSERVATIONAL SIGNAL`: Prevalencia observada $\ge 60\%$ con persistencia multicanal.
+   - `HIGH PREVALENCE SIGNAL`: Prevalencia observada $\ge 40\%$ o concentración temática severa.
+   - `RECURRENT PATTERN`: Prevalencia observada entre $12\%$ y $39.9\%$.
+   - `EMERGING SIGNAL`: Prevalencia observada entre $6\%$ y $11.9\%$.
+   - `LIMITED EVIDENCE`: Prevalencia observada $< 6\%$ o muestra exploratoria reducida ($< 6$ menciones).
 
----
+3. **Niveles de Atención Gerencial (`managementAttention`)**:
+   - `HIGH ATTENTION`: Señales con sentimiento negativo concentrado en tópicos críticos (demora, calidad sanitaria, quiebre masivo).
+   - `ATTENTION`: Patrones recurrentes operacionales o de producto con impacto directo en experiencia.
+   - `WATCH`: Señales emergentes de seguimiento en turno o plaza específica.
+   - *Nota de salvaguarda*: Toda alerta incluye un badge informativo: *"Esta alerta indica recurrencia y peso observacional dentro del corpus seleccionado. No identifica por sí sola la causa del fenómeno."*
 
-## 5. Transparencia y Limitaciones
-
-- **Carácter exploratorio**: La muestra de 104 reseñas reales permite validar la pertinencia de los modelos de NLP y la usabilidad de los tableros ejecutivos, pero no constituye un censo estadístico de la totalidad de clientes de la red de 90 sucursales.
-- **Competidores**: Las reseñas de Grido y Cremolatti en el entorno de demostración se encuentran catalogadas como prototipo analítico comparativo con fines pedagógicos y estratégicos.
+4. **Inferencia Temporal y Meteorológica Restrictiva**:
+   - La fecha de publicación de una review no determina la hora de consumo.
+   - El atributo `timeSlot` (`Morning`, `Afternoon`, `Night`) **sólo se infiere si el texto verbatim contiene marcadores explícitos** (ej. "fui a la noche", "a las 22hs", "merienda", "desayuno"). Si no existen marcadores, se registra como `Unknown`.
+   - La vinculación con datos climáticos se cataloga como `weatherEligibility: "ineligible"` para reseñas con `timeSlot: "Unknown"`, evitando correlaciones espurias de temperatura diurna con visitas nocturnas.
