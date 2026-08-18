@@ -1,5 +1,5 @@
 {
-  "name": "El Sabor de la IA by Duomo Helados",
+  "name": "El Sabor de la IA en Duomo Helados",
   "description": "Plataforma de AI Consumer Intelligence y Decision Support System para Helados Duomo (90 sucursales) vs Grido y Cremolatti en el NEA argentino.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

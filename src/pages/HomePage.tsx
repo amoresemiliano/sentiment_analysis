@@ -51,7 +51,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectPage }) => {
             <div className="h-10 w-px bg-stone-200 hidden sm:block" />
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#112A23] font-['Outfit'] tracking-tight leading-[1.15]">
               El Sabor de la IA <br className="hidden sm:inline" />
-              <span className="text-[#1B4D3E] text-xl sm:text-2xl font-bold">by Duomo Helados</span>
+              <span className="text-[#1B4D3E] text-xl sm:text-2xl font-bold">en Duomo Helados</span>
             </h1>
           </div>
 

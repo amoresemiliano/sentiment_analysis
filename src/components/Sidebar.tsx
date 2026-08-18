@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`bg-[#143D32] text-stone-200 flex flex-col border-r border-[#0D2D24] transition-all duration-300 select-none z-30 shrink-0 ${
+      className={`hidden md:flex bg-[#143D32] text-stone-200 flex-col border-r border-[#0D2D24] transition-all duration-300 select-none z-30 shrink-0 ${
         isCollapsed ? "w-18" : "w-68"
       }`}
     >
@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 El Sabor de la IA
               </span>
               <span className="text-[10px] block text-emerald-300 font-medium truncate">
-                by Duomo Helados · 90 sucursales
+                en Duomo Helados · 90 sucursales
               </span>
             </div>
           </div>

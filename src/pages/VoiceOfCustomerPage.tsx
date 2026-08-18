@@ -302,7 +302,58 @@ export const VoiceOfCustomerPage: React.FC<VoiceOfCustomerPageProps> = ({
             </p>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card List (Visible on mobile <640px) */}
+          <div className="space-y-3 sm:hidden">
+            {topicMatrix.map((row) => (
+              <div
+                key={row.topic}
+                className="p-3.5 bg-[#FAF9F5] border border-stone-200/90 rounded-xl space-y-2.5"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-stone-900 text-xs">{row.topic}</h4>
+                    <span className="text-[10px] text-stone-500">{row.category}</span>
+                  </div>
+                  <span
+                    className={`font-extrabold px-2 py-0.5 rounded text-[11px] ${
+                      row.netScore > 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                    }`}
+                  >
+                    Net: {row.netScore > 0 ? `+${row.netScore}` : row.netScore}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5 pt-1">
+                  <button
+                    onClick={() => handleCellClick(row.topic, "positive")}
+                    className="min-h-[40px] py-1 px-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-center font-bold text-[11px] transition-all cursor-pointer flex flex-col items-center justify-center"
+                  >
+                    <span className="text-[9px] text-emerald-700 font-semibold uppercase">Positivo</span>
+                    <span>{row.positiveCount} ops</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCellClick(row.topic, "neutral")}
+                    className="min-h-[40px] py-1 px-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300/80 text-center font-semibold text-[11px] transition-all cursor-pointer flex flex-col items-center justify-center"
+                  >
+                    <span className="text-[9px] text-stone-500 uppercase">Neutro</span>
+                    <span>{row.neutralCount} ops</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCellClick(row.topic, "negative")}
+                    className="min-h-[40px] py-1 px-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 text-center font-bold text-[11px] transition-all cursor-pointer flex flex-col items-center justify-center"
+                  >
+                    <span className="text-[9px] text-rose-700 font-semibold uppercase">Quejas</span>
+                    <span>{row.negativeCount} ops</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop/Tablet Table (Visible on sm+) */}
+          <div className="overflow-x-auto hidden sm:block">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
                 <tr className="border-b border-stone-200 bg-[#FAF9F5]">

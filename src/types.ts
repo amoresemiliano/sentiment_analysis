@@ -27,6 +27,7 @@ export interface Review {
   author?: string;
   flavor?: string;
   dataType: DataType;
+  isRealPilot?: boolean;
   sourceUrl?: string;
   url?: string;
   collectedAt?: string;

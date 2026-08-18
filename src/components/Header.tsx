@@ -22,19 +22,11 @@ export const Header: React.FC<HeaderProps> = ({
   const currentItem = NAV_ITEMS.find((item) => item.id === currentPage);
 
   return (
-    <header className="h-16 bg-[#FAF9F5] border-b border-stone-200/90 px-4 sm:px-6 flex items-center justify-between gap-4 z-20 shrink-0 font-['Plus_Jakarta_Sans']">
+    <header className="hidden md:flex h-16 bg-[#FAF9F5] border-b border-stone-200/90 px-4 sm:px-6 items-center justify-between gap-4 z-20 shrink-0 font-['Plus_Jakarta_Sans']">
       {/* Left: Mobile trigger & Page title */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={onToggleMobileMenu}
-          className="p-2 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 md:hidden transition-colors cursor-pointer"
-          aria-label="Abrir menú"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
         <div className="flex items-center gap-2.5">
-          <div className="text-stone-400 font-medium text-xs hidden sm:inline truncate max-w-[220px]">
+          <div className="text-stone-400 font-medium text-xs hidden lg:inline truncate max-w-[220px]">
             El Sabor de la IA /
           </div>
           <h1 className="text-base sm:text-lg font-bold text-stone-900 font-['Outfit'] tracking-tight">

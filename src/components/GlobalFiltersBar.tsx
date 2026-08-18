@@ -70,7 +70,7 @@ export const GlobalFiltersBar: React.FC<GlobalFiltersBarProps> = ({
   };
 
   return (
-    <div className="bg-[#FAF9F5] border-b border-stone-200/90 px-4 sm:px-6 py-2.5 transition-all text-xs font-['Plus_Jakarta_Sans'] shadow-2xs">
+    <div className="hidden md:block bg-[#FAF9F5] border-b border-stone-200/90 px-4 sm:px-6 py-2.5 transition-all text-xs font-['Plus_Jakarta_Sans'] shadow-2xs">
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex flex-wrap items-center gap-2 flex-1">
           <div className="flex items-center gap-1 text-stone-500 font-bold uppercase tracking-wider text-[10px] mr-1">
